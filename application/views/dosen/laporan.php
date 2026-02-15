@@ -39,7 +39,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <?php if ($l->is_acc_desiminasi): ?>
+                                    <?php if ($l->is_acc_desiminasi === true || $l->is_acc_desiminasi === 't' || $l->is_acc_desiminasi === '1'): ?>
                                         <span class="badge bg-success"><i class="bi bi-check"></i> Ya</span>
                                     <?php else: ?>
                                         <span class="badge bg-secondary">Belum</span>
@@ -57,51 +57,6 @@
                                     <?php endif; ?>
                                 </td>
                             </tr>
-
-                            <!-- Review Modal -->
-                            <div class="modal fade" id="reviewModal<?= $l->laporan_id ?>" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Review Laporan</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <form method="post" action="<?= base_url('dosen/laporan_acc/' . $l->laporan_id) ?>">
-                                            <div class="modal-body">
-                                                <div class="alert alert-info">
-                                                    <strong><?= $l->nama_mahasiswa ?></strong> -
-                                                    <?= ucfirst($l->jenis_laporan) ?>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Catatan (Optional)</label>
-                                                    <textarea name="catatan_dpl" class="form-control" rows="3"></textarea>
-                                                </div>
-                                                <div class="form-check mb-3">
-                                                    <input class="form-check-input" type="checkbox" name="is_acc_desiminasi"
-                                                        value="1" id="accDesiminasi<?= $l->laporan_id ?>">
-                                                    <label class="form-check-label" for="accDesiminasi<?= $l->laporan_id ?>">
-                                                        <strong>ACC untuk Desiminasi</strong><br>
-                                                        <small class="text-muted">Centang jika mahasiswa siap untuk
-                                                            desiminasi</small>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-success">
-                                                    <i class="bi bi-check me-1"></i>ACC
-                                                </button>
-                                                <button type="submit"
-                                                    formaction="<?= base_url('dosen/laporan_revisi/' . $l->laporan_id) ?>"
-                                                    class="btn btn-warning">
-                                                    <i class="bi bi-pencil me-1"></i>Revisi
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -114,3 +69,66 @@
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Modals di luar table agar tidak ngeblink -->
+<?php if (!empty($laporan)): ?>
+    <?php foreach ($laporan as $l): ?>
+        <?php if ($l->status_dpl == 'menunggu'): ?>
+        <div class="modal fade" id="reviewModal<?= $l->laporan_id ?>" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="bi bi-file-earmark-text me-2"></i>Review Laporan</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="post" action="<?= base_url('dosen/laporan_acc/' . $l->laporan_id) ?>">
+                        <div class="modal-body">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body py-2">
+                                    <table class="table table-borderless table-sm mb-0">
+                                        <tr>
+                                            <td width="120"><strong>Mahasiswa</strong></td>
+                                            <td><?= $l->nama_mahasiswa ?> (<?= $l->nim ?>)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Jenis Laporan</strong></td>
+                                            <td><span class="badge bg-secondary"><?= ucfirst($l->jenis_laporan) ?></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Laporan</strong></td>
+                                            <td>
+                                                <a href="<?= $l->link_laporan ?>" target="_blank" class="text-primary">
+                                                    <i class="bi bi-box-arrow-up-right me-1"></i>Lihat Laporan
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Catatan (Optional)</strong></label>
+                                <textarea name="catatan_dpl" class="form-control" rows="3"
+                                    placeholder="Berikan catatan untuk mahasiswa..."></textarea>
+                            </div>
+                            <div class="alert alert-success mb-0 py-2">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <small>ACC laporan akan otomatis mengizinkan mahasiswa mengajukan desiminasi</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" formaction="<?= base_url('dosen/laporan_revisi/' . $l->laporan_id) ?>"
+                                class="btn btn-warning">
+                                <i class="bi bi-pencil me-1"></i>Revisi
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle me-1"></i>ACC
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>

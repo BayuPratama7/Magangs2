@@ -83,6 +83,9 @@ class Desiminasi extends CI_Controller
 
         $this->db->trans_start();
 
+        // Get desiminasi detail untuk mahasiswa_id
+        $desiminasi = $this->Desiminasi_model->get_by_id($desiminasi_id);
+
         // 1. Update desiminasi - assign penguji
         $this->Desiminasi_model->update($desiminasi_id, [
             'penguji_id' => $penguji_id,
@@ -92,6 +95,7 @@ class Desiminasi extends CI_Controller
         // 2. Insert jadwal desiminasi
         $jadwal_data = [
             'desiminasi_id' => $desiminasi_id,
+            'mahasiswa_id' => $desiminasi->mahasiswa_id,
             'tanggal_desiminasi' => $tanggal,
             'waktu_mulai' => $waktu_mulai,
             'waktu_selesai' => $waktu_selesai,
@@ -100,6 +104,16 @@ class Desiminasi extends CI_Controller
             'status' => 'menunggu_konfirmasi'
         ];
         $this->Jadwal_model->insert($jadwal_data);
+
+        // 3. Buat record hasil_desiminasi agar penguji bisa input hasil & mahasiswa bisa upload laporan
+        $this->load->model('Administrasi_model');
+        $existing_hasil = $this->Administrasi_model->get_hasil_by_desiminasi($desiminasi_id);
+        if (!$existing_hasil) {
+            $this->Administrasi_model->insert_hasil([
+                'desiminasi_id' => $desiminasi_id,
+                'mahasiswa_id' => $desiminasi->mahasiswa_id
+            ]);
+        }
 
         $this->db->trans_complete();
 

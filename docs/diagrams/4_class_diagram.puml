@@ -1,0 +1,340 @@
+@startuml ClassDiagram
+title Class Diagram\nSistem Pengelolaan Magang Prodi Sistem Informasi
+
+skinparam class {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
+    ArrowColor #A80036
+}
+skinparam classAttributeIconSize 0
+
+' =====================================================
+' MODELS (berdasarkan kode CodeIgniter)
+' =====================================================
+
+class User_model {
+    - table: string = "users"
+    - jabatan_role_map: array
+    - role_id_name_map: array
+    - role_name_id_map: array
+    --
+    + get_by_email(email): object
+    + getUserByEmail(email): object
+    + insert(data): bool
+    + getRolesByUser(user_id): array
+    + assignRolesByJabatan(user_id, jabatan): bool
+    + safeInsertRole(user_id, role_id): bool
+    + removeExistingRolesBeforeReassign(user_id): bool
+    + mapRoleIdToName(role_id): string
+    + mapRoleNameToId(role_name): int
+    + getRoleIdNameMap(): array
+}
+
+class Role_model {
+    - table: string = "roles"
+    --
+    + get_all(): array
+    + get_by_id(id): object
+}
+
+class Mahasiswa_model {
+    --
+    + get_all(): array
+    + get_by_id(id): object
+    + get_by_user(user_id): object
+    + insert(data): bool
+    + update(id, data): bool
+    + delete(id): bool
+    + get_all_with_details(): array
+}
+
+class Dosen_model {
+    --
+    + get_all(): array
+    + get_by_user(user_id): object
+    + get_mahasiswa_bimbingan(dosen_id): array
+    + get_all_penguji(): array
+    + get_all_dpl(): array
+}
+
+class Proposal_model {
+    --
+    + get_by_mahasiswa(mahasiswa_id): object
+    + get_all_pending(): array
+    + get_pending_kaprodi(): array
+    + insert(data): bool
+    + update(id, data): bool
+    + get_detail(id): object
+}
+
+class Logbook_model {
+    --
+    + get_by_mahasiswa(mahasiswa_id): array
+    + get_all_by_dpl(dosen_id): array
+    + insert(data): bool
+    + update(id, data): bool
+}
+
+class Laporan_model {
+    --
+    + get_by_mahasiswa(mahasiswa_id): array
+    + get_all_by_dpl(dosen_id): array
+    + insert(data): bool
+    + update(id, data): bool
+}
+
+class Desiminasi_model {
+    --
+    + get_all_pending(): array
+    + get_by_id(id): object
+    + get_detail(id): object
+    + get_pending_konfirmasi(dosen_id): array
+    + insert(data): bool
+    + update(id, data): bool
+    + konfirmasi_penguji(id, status): bool
+}
+
+class Jadwal_model {
+    --
+    + get_all(): array
+    + get_by_mahasiswa(mahasiswa_id): array
+    + insert(data): bool
+    + update(id, data): bool
+}
+
+class Administrasi_model {
+    --
+    + get_hasil_by_desiminasi(desiminasi_id): object
+    + get_hasil_by_mahasiswa(mahasiswa_id): object
+    + insert_hasil(data): bool
+    + update_hasil(id, data): bool
+    + get_surat_list(): array
+    + create_surat(data): bool
+}
+
+class Dashboard_model {
+    --
+    + get_stats_mahasiswa(user_id): object
+    + get_stats_koordinator(): object
+    + get_stats_sekretaris(): object
+    + get_stats_dosen(dosen_id): object
+    + get_stats_kaprodi(): object
+    + get_stats_penguji(dosen_id): object
+}
+
+' =====================================================
+' DATABASE ENTITIES
+' =====================================================
+
+package "Database Tables" <<Rectangle>> {
+    entity "roles" as T_ROLES {
+        * role_id : SERIAL <<PK>>
+        --
+        nama_role : VARCHAR(50)
+        deskripsi : TEXT
+        created_at : TIMESTAMP
+    }
+
+    entity "users" as T_USERS {
+        * user_id : SERIAL <<PK>>
+        --
+        email : VARCHAR(100) <<UNIQUE>>
+        password : VARCHAR(255)
+        nama_lengkap : VARCHAR(100)
+        role_id : INTEGER <<FK>>
+        jabatan : VARCHAR(20)
+        is_active : BOOLEAN
+        created_at : TIMESTAMP
+        updated_at : TIMESTAMP
+    }
+
+    entity "user_roles" as T_USER_ROLES {
+        * id : SERIAL <<PK>>
+        --
+        user_id : INTEGER <<FK>>
+        role_id : INTEGER <<FK>>
+        created_at : TIMESTAMP
+        .. UNIQUE(user_id, role_id) ..
+    }
+
+    entity "dosen" as T_DOSEN {
+        * dosen_id : SERIAL <<PK>>
+        --
+        user_id : INTEGER <<FK>>
+        nidn : VARCHAR(20)
+        nama_dosen : VARCHAR(100)
+        email : VARCHAR(100)
+        no_hp : VARCHAR(20)
+        bidang_keahlian : VARCHAR(100)
+        is_dpl : BOOLEAN
+        is_penguji : BOOLEAN
+        created_at : TIMESTAMP
+    }
+
+    entity "mahasiswa" as T_MHS {
+        * mahasiswa_id : SERIAL <<PK>>
+        --
+        user_id : INTEGER <<FK>>
+        nim : VARCHAR(20) <<UNIQUE>>
+        nama_mahasiswa : VARCHAR(100)
+        prodi : VARCHAR(50)
+        angkatan : INTEGER
+        kelas : VARCHAR(10)
+        no_hp : VARCHAR(20)
+        alamat : TEXT
+        dosen_dpl_id : INTEGER <<FK>>
+        status_magang : VARCHAR(30)
+        created_at : TIMESTAMP
+    }
+
+    entity "proposal_magang" as T_PROPOSAL {
+        * proposal_id : SERIAL <<PK>>
+        --
+        mahasiswa_id : INTEGER <<FK>>
+        judul_proposal : VARCHAR(255)
+        instansi_tujuan : VARCHAR(200)
+        alamat_instansi : TEXT
+        jenis_magang : VARCHAR(20)
+        tanggal_mulai : DATE
+        tanggal_selesai : DATE
+        link_proposal : VARCHAR(500)
+        link_surat_penerimaan : VARCHAR(500)
+        status_koordinator : VARCHAR(20)
+        catatan_koordinator : TEXT
+        status_kaprodi : VARCHAR(20)
+        catatan_kaprodi : TEXT
+        created_at : TIMESTAMP
+    }
+
+    entity "surat_pengantar" as T_SURAT {
+        * surat_id : SERIAL <<PK>>
+        --
+        proposal_id : INTEGER <<FK>>
+        mahasiswa_id : INTEGER <<FK>>
+        nomor_surat : VARCHAR(50)
+        tanggal_surat : DATE
+        perihal : VARCHAR(200)
+        file_surat : VARCHAR(500)
+        created_by : INTEGER <<FK>>
+    }
+
+    entity "logbook_magang" as T_LOGBOOK {
+        * logbook_id : SERIAL <<PK>>
+        --
+        mahasiswa_id : INTEGER <<FK>>
+        proposal_id : INTEGER <<FK>>
+        bulan_ke : INTEGER
+        link_logbook : VARCHAR(500)
+        status_dpl : VARCHAR(20)
+        catatan_dpl : TEXT
+        status_koordinator : VARCHAR(20)
+        .. UNIQUE(mahasiswa_id, bulan_ke) ..
+    }
+
+    entity "laporan_magang" as T_LAPORAN {
+        * laporan_id : SERIAL <<PK>>
+        --
+        mahasiswa_id : INTEGER <<FK>>
+        proposal_id : INTEGER <<FK>>
+        jenis_laporan : VARCHAR(30)
+        link_laporan : VARCHAR(500)
+        status_dpl : VARCHAR(20)
+        catatan_dpl : TEXT
+        is_acc_desiminasi : BOOLEAN
+    }
+
+    entity "desiminasi" as T_DESIM {
+        * desiminasi_id : SERIAL <<PK>>
+        --
+        mahasiswa_id : INTEGER <<FK>>
+        proposal_id : INTEGER <<FK>>
+        laporan_id : INTEGER <<FK>>
+        penguji_id : INTEGER <<FK>>
+        status_pengajuan : VARCHAR(20)
+        konfirmasi_penguji : VARCHAR(20)
+    }
+
+    entity "jadwal_desiminasi" as T_JADWAL {
+        * jadwal_id : SERIAL <<PK>>
+        --
+        desiminasi_id : INTEGER <<FK>>
+        mahasiswa_id : INTEGER <<FK>>
+        tanggal_desiminasi : DATE
+        waktu_mulai : TIME
+        waktu_selesai : TIME
+        ruangan : VARCHAR(50)
+        link_online : VARCHAR(500)
+        status : VARCHAR(20)
+    }
+
+    entity "hasil_desiminasi" as T_HASIL {
+        * hasil_id : SERIAL <<PK>>
+        --
+        desiminasi_id : INTEGER <<FK>>
+        mahasiswa_id : INTEGER <<FK>>
+        nilai : DECIMAL(5,2)
+        status_kelulusan : VARCHAR(20)
+        catatan_revisi : TEXT
+        link_laporan_akhir : VARCHAR(500)
+        status_laporan_akhir : VARCHAR(20)
+        catatan_penguji : TEXT
+    }
+
+    entity "mitra_kerjasama" as T_MITRA {
+        * mitra_id : SERIAL <<PK>>
+        --
+        nama_mitra : VARCHAR(200)
+        jenis_mitra : VARCHAR(50)
+        kota : VARCHAR(100)
+        provinsi : VARCHAR(100)
+        is_active : BOOLEAN
+    }
+
+    entity "sebaran_magang" as T_SEBARAN {
+        * sebaran_id : SERIAL <<PK>>
+        --
+        periode : VARCHAR(20)
+        wilayah : VARCHAR(100)
+        jenis_magang : VARCHAR(20)
+        jumlah_mahasiswa : INTEGER
+    }
+}
+
+' =====================================================
+' RELATIONSHIPS (Database)
+' =====================================================
+
+T_USERS ||--o{ T_USER_ROLES : "memiliki"
+T_ROLES ||--o{ T_USER_ROLES : "dimiliki"
+T_USERS ||--o| T_DOSEN : "adalah"
+T_USERS ||--o| T_MHS : "adalah"
+T_USERS }o--|| T_ROLES : "role utama"
+T_MHS ||--o{ T_PROPOSAL : "mengajukan"
+T_MHS ||--o{ T_LOGBOOK : "mengisi"
+T_MHS ||--o{ T_LAPORAN : "mengirim"
+T_MHS ||--o{ T_DESIM : "mengajukan"
+T_MHS }o--o| T_DOSEN : "dibimbing oleh"
+T_PROPOSAL ||--o| T_SURAT : "menghasilkan"
+T_DESIM ||--o| T_JADWAL : "dijadwalkan"
+T_DESIM ||--o| T_HASIL : "menghasilkan"
+T_DESIM }o--o| T_DOSEN : "diuji oleh"
+T_DESIM }o--|| T_LAPORAN : "berdasarkan"
+
+' =====================================================
+' MODEL - TABLE MAPPING
+' =====================================================
+
+User_model ..> T_USERS : manages
+User_model ..> T_USER_ROLES : manages
+Role_model ..> T_ROLES : manages
+Mahasiswa_model ..> T_MHS : manages
+Dosen_model ..> T_DOSEN : manages
+Proposal_model ..> T_PROPOSAL : manages
+Logbook_model ..> T_LOGBOOK : manages
+Laporan_model ..> T_LAPORAN : manages
+Desiminasi_model ..> T_DESIM : manages
+Jadwal_model ..> T_JADWAL : manages
+Administrasi_model ..> T_HASIL : manages
+Administrasi_model ..> T_SURAT : manages
+
+@enduml

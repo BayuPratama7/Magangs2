@@ -234,9 +234,86 @@
                 </div>
             </div>
         <?php endif; ?>
-    </div>
 
-    <!-- Sidebar Info -->
+        <!-- Jadwal Desiminasi -->
+        <?php if (isset($desiminasi) && $desiminasi && $desiminasi->tanggal_desiminasi): ?>
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-calendar-event me-2"></i>Jadwal Desiminasi
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3"
+                                    style="width: 45px; height: 45px; min-width: 45px;">
+                                    <i class="bi bi-calendar-date text-primary fs-5"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Tanggal</small>
+                                    <strong><?= date('d F Y', strtotime($desiminasi->tanggal_desiminasi)) ?></strong>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center me-3"
+                                    style="width: 45px; height: 45px; min-width: 45px;">
+                                    <i class="bi bi-clock text-success fs-5"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Waktu</small>
+                                    <strong><?= $desiminasi->waktu_mulai ?></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center me-3"
+                                    style="width: 45px; height: 45px; min-width: 45px;">
+                                    <i class="bi bi-geo-alt text-warning fs-5"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Ruangan</small>
+                                    <strong><?= $desiminasi->ruangan ?? 'Online' ?></strong>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center me-3"
+                                    style="width: 45px; height: 45px; min-width: 45px;">
+                                    <i class="bi bi-person-workspace text-info fs-5"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Penguji</small>
+                                    <strong><?= $desiminasi->nama_penguji ?? '-' ?></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php if (isset($hasil_desiminasi) && $hasil_desiminasi && $hasil_desiminasi->status_kelulusan): ?>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="bi bi-trophy me-1"></i>Hasil:
+                                <strong class="text-<?= $hasil_desiminasi->status_kelulusan == 'lulus' ? 'success' : ($hasil_desiminasi->status_kelulusan == 'lulus_bersyarat' ? 'warning' : 'danger') ?>">
+                                    <?= strtoupper(str_replace('_', ' ', $hasil_desiminasi->status_kelulusan)) ?>
+                                </strong>
+                            </span>
+                            <a href="<?= base_url('desiminasi') ?>" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-arrow-right me-1"></i>Detail
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <hr class="my-2">
+                        <div class="text-center">
+                            <a href="<?= base_url('desiminasi') ?>" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-arrow-right me-1"></i>Lihat Detail Desiminasi
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
     <div class="col-lg-4">
         <!-- Sebaran Magang -->
         <div class="card mb-4">
@@ -245,12 +322,41 @@
             </div>
             <div class="card-body">
                 <?php if (isset($sebaran_jenis) && !empty($sebaran_jenis)): ?>
+                    <canvas id="sebaranChartMahasiswa" style="max-height: 200px;"></canvas>
+                    <hr class="my-3">
                     <?php foreach ($sebaran_jenis as $s): ?>
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span><?= strtoupper($s->jenis_magang) ?></span>
                             <span class="badge bg-secondary"><?= $s->total ?> mahasiswa</span>
                         </div>
                     <?php endforeach; ?>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const ctxMhs = document.getElementById('sebaranChartMahasiswa').getContext('2d');
+                            new Chart(ctxMhs, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: [<?php foreach ($sebaran_jenis as $s): ?>'<?= strtoupper($s->jenis_magang) ?>',<?php endforeach; ?>],
+                                    datasets: [{
+                                        data: [<?php foreach ($sebaran_jenis as $s): ?><?= $s->total ?>,<?php endforeach; ?>],
+                                        backgroundColor: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
+                                        borderWidth: 2,
+                                        borderColor: '#fff'
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: true,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom',
+                                            labels: { padding: 15, usePointStyle: true }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
                 <?php else: ?>
                     <p class="text-muted mb-0 small">Data belum tersedia</p>
                 <?php endif; ?>

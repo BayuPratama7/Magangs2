@@ -53,43 +53,6 @@
                                     <?php endif; ?>
                                 </td>
                             </tr>
-
-                            <!-- Review Modal -->
-                            <div class="modal fade" id="reviewModal<?= $l->logbook_id ?>" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Review Logbook</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <form method="post"
-                                            action="<?= base_url('dosen/logbook_review/' . $l->logbook_id . '/sudah_review') ?>">
-                                            <div class="modal-body">
-                                                <div class="alert alert-info">
-                                                    <strong><?= $l->nama_mahasiswa ?></strong> - Bulan ke-<?= $l->bulan_ke ?>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Catatan (Optional)</label>
-                                                    <textarea name="catatan_dpl" class="form-control" rows="3"
-                                                        placeholder="Catatan untuk mahasiswa..."></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-success">
-                                                    <i class="bi bi-check me-1"></i>ACC
-                                                </button>
-                                                <button type="submit"
-                                                    formaction="<?= base_url('dosen/logbook_review/' . $l->logbook_id . '/revisi') ?>"
-                                                    class="btn btn-warning">
-                                                    <i class="bi bi-pencil me-1"></i>Revisi
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -102,3 +65,42 @@
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Modals harus di luar table agar tidak ngeblink -->
+<?php if (!empty($logbooks)): ?>
+    <?php foreach ($logbooks as $l): ?>
+        <div class="modal fade" id="reviewModal<?= $l->logbook_id ?>" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Review Logbook</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="post" action="<?= base_url('dosen/logbook_review/' . $l->logbook_id . '/sudah_review') ?>">
+                        <div class="modal-body">
+                            <div class="alert alert-info">
+                                <strong><?= $l->nama_mahasiswa ?></strong> - Bulan ke-<?= $l->bulan_ke ?>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Catatan (Optional)</label>
+                                <textarea name="catatan_dpl" class="form-control" rows="3"
+                                    placeholder="Catatan untuk mahasiswa..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check me-1"></i>ACC
+                            </button>
+                            <button type="submit"
+                                formaction="<?= base_url('dosen/logbook_review/' . $l->logbook_id . '/revisi') ?>"
+                                class="btn btn-warning">
+                                <i class="bi bi-pencil me-1"></i>Revisi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>

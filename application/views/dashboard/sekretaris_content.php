@@ -165,5 +165,59 @@
                     Sebaran</a>
             </div>
         </div>
+
+        <!-- Sebaran Jenis Magang -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <i class="bi bi-pie-chart me-2"></i>Sebaran Jenis Magang
+            </div>
+            <div class="card-body">
+                <?php if (isset($sebaran_jenis) && !empty($sebaran_jenis)): ?>
+                    <canvas id="sebaranChartSekretaris" style="max-height: 200px;"></canvas>
+                    <hr class="my-3">
+                    <?php
+                    $colors = ['reguler' => 'primary', 'bumn' => 'success', 'mbkm' => 'warning'];
+                    foreach ($sebaran_jenis as $s):
+                    ?>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>
+                                <span class="badge bg-<?= $colors[$s->jenis_magang] ?? 'secondary' ?> me-2">&nbsp;</span>
+                                <?= strtoupper($s->jenis_magang) ?>
+                            </span>
+                            <strong><?= $s->total ?></strong>
+                        </div>
+                    <?php endforeach; ?>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const ctxSekretaris = document.getElementById('sebaranChartSekretaris').getContext('2d');
+                            new Chart(ctxSekretaris, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: [<?php foreach ($sebaran_jenis as $s): ?>'<?= strtoupper($s->jenis_magang) ?>',<?php endforeach; ?>],
+                                    datasets: [{
+                                        data: [<?php foreach ($sebaran_jenis as $s): ?><?= $s->total ?>,<?php endforeach; ?>],
+                                        backgroundColor: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
+                                        borderWidth: 2,
+                                        borderColor: '#fff'
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: true,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom',
+                                            labels: { padding: 10, usePointStyle: true, font: { size: 11 } }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                <?php else: ?>
+                    <p class="text-muted mb-0">Data belum tersedia</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>

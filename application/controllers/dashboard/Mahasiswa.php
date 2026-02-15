@@ -97,6 +97,8 @@ class Mahasiswa extends CI_Controller
             'surat_pengantar' => $surat_pengantar,
             'dpl' => $dpl,
             'stats' => $stats,
+            'desiminasi' => $desiminasi,
+            'hasil_desiminasi' => $hasil_desiminasi,
             'mitra' => $mitra,
             'sebaran_jenis' => $sebaran_jenis
         ];

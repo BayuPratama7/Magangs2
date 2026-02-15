@@ -113,17 +113,16 @@ class DosenController extends CI_Controller
     public function laporan_acc($laporan_id)
     {
         $catatan = $this->input->post('catatan_dpl');
-        $is_acc_desiminasi = $this->input->post('is_acc_desiminasi') ? true : false;
 
         $data = [
             'status_dpl' => 'disetujui',
             'catatan_dpl' => $catatan,
             'tanggal_review_dpl' => date('Y-m-d H:i:s'),
-            'is_acc_desiminasi' => $is_acc_desiminasi
+            'is_acc_desiminasi' => true // otomatis ACC desiminasi saat laporan disetujui
         ];
 
         if ($this->Laporan_model->update($laporan_id, $data)) {
-            $this->session->set_flashdata('success', 'Laporan berhasil di-ACC');
+            $this->session->set_flashdata('success', 'Laporan berhasil di-ACC dan siap desiminasi');
         } else {
             $this->session->set_flashdata('error', 'Gagal ACC laporan');
         }

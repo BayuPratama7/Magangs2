@@ -187,7 +187,7 @@ CREATE TABLE jadwal_desiminasi (
     waktu_selesai TIME,
     ruangan VARCHAR(50),
     link_online VARCHAR(500),
-    status VARCHAR(20) DEFAULT 'terjadwal' CHECK (status IN ('terjadwal', 'selesai', 'batal')),
+    status VARCHAR(20) DEFAULT 'terjadwal' CHECK (status IN ('terjadwal', 'selesai', 'batal', 'menunggu_konfirmasi', 'terkonfirmasi')),
     created_by INTEGER REFERENCES users(user_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -203,7 +203,7 @@ CREATE TABLE hasil_desiminasi (
     status_kelulusan VARCHAR(20) CHECK (status_kelulusan IN ('lulus', 'tidak_lulus', 'lulus_bersyarat')),
     catatan_revisi TEXT,
     link_laporan_akhir VARCHAR(500),
-    status_laporan_akhir VARCHAR(20) DEFAULT 'menunggu' CHECK (status_laporan_akhir IN ('menunggu', 'disetujui', 'revisi')),
+    status_laporan_akhir VARCHAR(20) DEFAULT 'menunggu' CHECK (status_laporan_akhir IN ('menunggu', 'disetujui', 'revisi', 'menunggu_revisi')),
     catatan_penguji TEXT,
     tanggal_acc_laporan_akhir TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -57,6 +57,7 @@ $route['default_controller'] = 'welcome';
 $route['auth/login'] = 'auth/auth/login';
 $route['auth/process'] = 'auth/auth/process';
 $route['auth/logout'] = 'auth/auth/logout';
+$route['auth/switch_role'] = 'auth/auth/switch_role';
 
 // ==========================================
 // DASHBOARD ROUTES (per role)
@@ -110,6 +111,10 @@ $route['desiminasi/upload_laporan_akhir'] = 'desiminasi/desiminasi/upload_lapora
 // ==========================================
 // ADMIN ROUTES (Sekretaris)
 // ==========================================
+$route['admin/mahasiswa'] = 'admin/admin/mahasiswa';
+$route['admin/mahasiswa_store'] = 'admin/admin/mahasiswa_store';
+$route['admin/mahasiswa_update/(:num)'] = 'admin/admin/mahasiswa_update/$1';
+$route['admin/mahasiswa_delete/(:num)'] = 'admin/admin/mahasiswa_delete/$1';
 $route['admin/dpl'] = 'admin/admin/dpl';
 $route['admin/assign_dpl'] = 'admin/admin/assign_dpl';
 $route['admin/surat'] = 'admin/admin/surat';

@@ -1,0 +1,150 @@
+@startuml UseCaseDiagram
+title Use Case Diagram\nSistem Pengelolaan Magang Prodi Sistem Informasi
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
+    ArrowColor #A80036
+}
+
+' =====================================================
+' ACTORS
+' =====================================================
+actor "Mahasiswa" as MHS
+actor "Dosen" as DSN
+actor "Koordinator\nMagang" as KOOR
+actor "Kaprodi" as KPD
+actor "Sekretaris\nProdi" as SEK
+
+' =====================================================
+' GENERALIZATION (Inheritance)
+' Koordinator, Kaprodi, Sekretaris mewarisi semua
+' use case milik Dosen (DPL + Penguji)
+' =====================================================
+DSN <|-- KOOR
+DSN <|-- KPD
+DSN <|-- SEK
+
+' =====================================================
+' SYSTEM BOUNDARY
+' =====================================================
+rectangle "Sistem Pengelolaan Magang" {
+
+    ' --- USE CASES UMUM ---
+    usecase "Login" as UC_LOGIN
+    usecase "Logout" as UC_LOGOUT
+
+    ' --- USE CASES MAHASISWA ---
+    usecase "Input Proposal\nMagang" as UC_PROPOSAL
+    usecase "Input Logbook\nMagang" as UC_LOGBOOK
+    usecase "Input Laporan\nMagang" as UC_LAPORAN
+    usecase "Ajukan\nDesiminasi" as UC_AJUKAN_DESIM
+    usecase "Upload Laporan\nAkhir (Revisi)" as UC_UPLOAD_AKHIR
+    usecase "Lihat Dashboard\nMahasiswa" as UC_DASH_MHS
+    usecase "Lihat Surat\nPengantar" as UC_SURAT_MHS
+    usecase "Lihat Jadwal\nDesiminasi" as UC_JADWAL_MHS
+
+    ' --- USE CASES DOSEN (DPL + Penguji) ---
+    usecase "Lihat Mahasiswa\nBimbingan" as UC_BIMBINGAN
+    usecase "Review Logbook\nMahasiswa" as UC_REVIEW_LOG
+    usecase "Review Laporan\nMahasiswa" as UC_REVIEW_LAP
+    usecase "ACC Laporan\nUntuk Desiminasi" as UC_ACC_LAP_DES
+    usecase "Lihat Jadwal\nDesiminasi (DPL)" as UC_JADWAL_DPL
+    usecase "Konfirmasi\nKesediaan Menguji" as UC_KONFIRMASI
+    usecase "Input Hasil\nDesiminasi" as UC_INPUT_HASIL
+    usecase "ACC Laporan\nAkhir" as UC_ACC_AKHIR
+    usecase "Lihat Dashboard\nDosen" as UC_DASH_DSN
+
+    ' --- USE CASES KOORDINATOR ---
+    usecase "ACC Proposal\n(Tahap 1)" as UC_ACC_PROP1
+    usecase "Monitoring\nLogbook" as UC_MON_LOG
+    usecase "Lihat Hasil\nDesiminasi (Koor)" as UC_HASIL_KOOR
+    usecase "Lihat Dashboard\nKoordinator" as UC_DASH_KOOR
+
+    ' --- USE CASES KAPRODI ---
+    usecase "ACC Proposal\n(Tahap 2)" as UC_ACC_PROP2
+    usecase "Lihat Hasil\nDesiminasi (Kaprodi)" as UC_HASIL_KPD
+    usecase "Lihat Dashboard\nKaprodi" as UC_DASH_KPD
+
+    ' --- USE CASES SEKRETARIS ---
+    usecase "Kelola Data\nMahasiswa" as UC_KELOLA_MHS
+    usecase "Assign Dosen\nPembimbing (DPL)" as UC_ASSIGN_DPL
+    usecase "Buat Surat\nPengantar" as UC_BUAT_SURAT
+    usecase "Assign Penguji\nDesiminasi" as UC_ASSIGN_PENGUJI
+    usecase "Buat Jadwal\nDesiminasi" as UC_BUAT_JADWAL
+    usecase "Proses Pengajuan\nDesiminasi" as UC_PROSES_DESIM
+    usecase "Kelola Mitra\nKerjasama" as UC_MITRA
+    usecase "Kelola Sebaran\nMagang" as UC_SEBARAN
+    usecase "Lihat Hasil\nDesiminasi (Sekre)" as UC_HASIL_SEK
+    usecase "Lihat Dashboard\nSekretaris" as UC_DASH_SEK
+
+    ' --- INCLUDE RELATIONSHIPS ---
+    UC_AJUKAN_DESIM ..> UC_ACC_LAP_DES : <<include>>
+    UC_ACC_PROP2 ..> UC_ACC_PROP1 : <<include>>
+    UC_INPUT_HASIL ..> UC_KONFIRMASI : <<include>>
+    UC_PROSES_DESIM ..> UC_ASSIGN_PENGUJI : <<include>>
+    UC_PROSES_DESIM ..> UC_BUAT_JADWAL : <<include>>
+
+    ' --- EXTEND RELATIONSHIPS ---
+    UC_UPLOAD_AKHIR ..> UC_AJUKAN_DESIM : <<extend>>
+    UC_SURAT_MHS ..> UC_PROPOSAL : <<extend>>
+}
+
+' =====================================================
+' ACTOR - USE CASE CONNECTIONS
+' =====================================================
+
+' --- Semua actor bisa Login/Logout ---
+MHS --> UC_LOGIN
+DSN --> UC_LOGIN
+UC_LOGIN --> UC_LOGOUT : <<include>>
+
+' --- Mahasiswa ---
+MHS --> UC_DASH_MHS
+MHS --> UC_PROPOSAL
+MHS --> UC_LOGBOOK
+MHS --> UC_LAPORAN
+MHS --> UC_AJUKAN_DESIM
+MHS --> UC_UPLOAD_AKHIR
+MHS --> UC_SURAT_MHS
+MHS --> UC_JADWAL_MHS
+
+' --- Dosen (DPL + Penguji) ---
+' Semua use case ini diwarisi oleh Koordinator, Kaprodi, Sekretaris
+DSN --> UC_DASH_DSN
+DSN --> UC_BIMBINGAN
+DSN --> UC_REVIEW_LOG
+DSN --> UC_REVIEW_LAP
+DSN --> UC_ACC_LAP_DES
+DSN --> UC_JADWAL_DPL
+DSN --> UC_KONFIRMASI
+DSN --> UC_INPUT_HASIL
+DSN --> UC_ACC_AKHIR
+
+' --- Koordinator (+ warisan Dosen) ---
+KOOR --> UC_DASH_KOOR
+KOOR --> UC_ACC_PROP1
+KOOR --> UC_MON_LOG
+KOOR --> UC_HASIL_KOOR
+
+' --- Kaprodi (+ warisan Dosen) ---
+KPD --> UC_DASH_KPD
+KPD --> UC_ACC_PROP2
+KPD --> UC_HASIL_KPD
+
+' --- Sekretaris (+ warisan Dosen) ---
+SEK --> UC_DASH_SEK
+SEK --> UC_KELOLA_MHS
+SEK --> UC_ASSIGN_DPL
+SEK --> UC_BUAT_SURAT
+SEK --> UC_ASSIGN_PENGUJI
+SEK --> UC_BUAT_JADWAL
+SEK --> UC_PROSES_DESIM
+SEK --> UC_MITRA
+SEK --> UC_SEBARAN
+SEK --> UC_HASIL_SEK
+
+@enduml

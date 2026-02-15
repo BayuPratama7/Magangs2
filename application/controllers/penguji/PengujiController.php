@@ -80,12 +80,22 @@ class PengujiController extends CI_Controller
     // Input hasil desiminasi
     public function input_hasil($desiminasi_id)
     {
-        $hasil = $this->Administrasi_model->get_hasil_by_desiminasi($desiminasi_id);
         $desiminasi = $this->Desiminasi_model->get_detail($desiminasi_id);
 
         if (!$desiminasi) {
             $this->session->set_flashdata('error', 'Data desiminasi tidak ditemukan');
             redirect('penguji/jadwal');
+        }
+
+        $hasil = $this->Administrasi_model->get_hasil_by_desiminasi($desiminasi_id);
+
+        // Jika record hasil belum ada, buat otomatis
+        if (!$hasil) {
+            $this->Administrasi_model->insert_hasil([
+                'desiminasi_id' => $desiminasi_id,
+                'mahasiswa_id' => $desiminasi->mahasiswa_id
+            ]);
+            $hasil = $this->Administrasi_model->get_hasil_by_desiminasi($desiminasi_id);
         }
 
         $data = [
@@ -162,7 +172,7 @@ class PengujiController extends CI_Controller
 
         $data = [
             'status_laporan_akhir' => 'revisi',
-            'catatan_revisi' => $catatan
+            'catatan_penguji' => $catatan
         ];
 
         if ($this->Administrasi_model->update_hasil($hasil_id, $data)) {

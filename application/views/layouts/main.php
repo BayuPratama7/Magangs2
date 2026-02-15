@@ -17,6 +17,9 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -43,15 +46,18 @@
             height: 100vh;
             background: var(--sidebar-bg);
             color: white;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
             z-index: 1000;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .sidebar-brand {
-            padding: 1.5rem;
+            padding: 1.2rem 1.5rem;
             background: var(--primary-gradient);
             text-align: center;
+            flex-shrink: 0;
         }
 
         .sidebar-brand h4 {
@@ -66,11 +72,31 @@
         }
 
         .sidebar-menu {
-            padding: 1rem 0;
+            padding: 0.75rem 0;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #475569 transparent;
+        }
+
+        .sidebar-menu::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background-color: #475569;
+            border-radius: 4px;
         }
 
         .sidebar-menu .menu-header {
-            padding: 0.75rem 1.5rem;
+            padding: 0.6rem 1.5rem 0.3rem;
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -81,11 +107,13 @@
         .sidebar-menu a {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1.5rem;
+            padding: 0.6rem 1.5rem;
             color: #cbd5e1;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: background 0.2s ease, color 0.2s ease;
             font-size: 0.875rem;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
         }
 
         .sidebar-menu a:hover,
@@ -105,7 +133,7 @@
         .main-content {
             margin-left: 260px;
             min-height: 100vh;
-            transition: all 0.3s ease;
+            transition: margin-left 0.3s ease;
         }
 
         /* Top Navbar */
@@ -149,11 +177,9 @@
             border: none;
             border-radius: 12px;
             box-shadow: var(--card-shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .card:hover {
-            transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
@@ -287,7 +313,6 @@
         }
 
         .btn-primary:hover {
-            transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
@@ -349,11 +374,11 @@
             <div class="menu-header">Menu Utama</div>
 
             <?php
-            $role_id = $this->session->userdata('role_id');
+            $active_role = $this->session->userdata('active_role');
             $current_url = uri_string();
             ?>
 
-            <?php if ($role_id == 5): // Mahasiswa ?>
+            <?php if ($active_role == 'mahasiswa'): ?>
                 <a href="<?= base_url('dashboard/mahasiswa') ?>"
                     class="<?= strpos($current_url, 'dashboard/mahasiswa') !== false ? 'active' : '' ?>">
                     <i class="bi bi-speedometer2"></i> Dashboard
@@ -375,7 +400,7 @@
                     <i class="bi bi-easel"></i> Desiminasi
                 </a>
 
-            <?php elseif ($role_id == 2): // Koordinator ?>
+            <?php elseif ($active_role == 'koordinator'): ?>
                 <a href="<?= base_url('dashboard/koordinator') ?>"
                     class="<?= strpos($current_url, 'dashboard/koordinator') !== false ? 'active' : '' ?>">
                     <i class="bi bi-speedometer2"></i> Dashboard
@@ -392,8 +417,38 @@
                     class="<?= strpos($current_url, 'koordinator/hasil') !== false ? 'active' : '' ?>">
                     <i class="bi bi-clipboard-check"></i> Hasil Desiminasi
                 </a>
+                <div class="menu-header">Pembimbing</div>
+                <a href="<?= base_url('dosen/bimbingan') ?>"
+                    class="<?= strpos($current_url, 'dosen/bimbingan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-people"></i> Mahasiswa Bimbingan
+                </a>
+                <a href="<?= base_url('dosen/logbook') ?>"
+                    class="<?= strpos($current_url, 'dosen/logbook') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-journal-text"></i> Review Logbook
+                </a>
+                <a href="<?= base_url('dosen/laporan') ?>"
+                    class="<?= strpos($current_url, 'dosen/laporan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-check"></i> Review Laporan
+                </a>
+                <a href="<?= base_url('dosen/jadwal') ?>"
+                    class="<?= strpos($current_url, 'dosen/jadwal') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-calendar"></i> Jadwal Desiminasi
+                </a>
+                <div class="menu-header">Penguji</div>
+                <a href="<?= base_url('penguji/konfirmasi') ?>"
+                    class="<?= strpos($current_url, 'penguji/konfirmasi') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-check2-circle"></i> Konfirmasi Menguji
+                </a>
+                <a href="<?= base_url('penguji/jadwal') ?>"
+                    class="<?= strpos($current_url, 'penguji/jadwal') !== false || strpos($current_url, 'penguji/input_hasil') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-calendar-check"></i> Jadwal Menguji
+                </a>
+                <a href="<?= base_url('penguji/laporan') ?>"
+                    class="<?= strpos($current_url, 'penguji/laporan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-check"></i> ACC Laporan Akhir
+                </a>
 
-            <?php elseif ($role_id == 1): // Kaprodi ?>
+            <?php elseif ($active_role == 'kaprodi'): ?>
                 <a href="<?= base_url('dashboard/kaprodi') ?>"
                     class="<?= strpos($current_url, 'dashboard/kaprodi') !== false && strpos($current_url, 'hasil') === false ? 'active' : '' ?>">
                     <i class="bi bi-speedometer2"></i> Dashboard
@@ -406,13 +461,47 @@
                     class="<?= strpos($current_url, 'dashboard/kaprodi/hasil') !== false ? 'active' : '' ?>">
                     <i class="bi bi-trophy"></i> Hasil Desiminasi
                 </a>
+                <div class="menu-header">Pembimbing</div>
+                <a href="<?= base_url('dosen/bimbingan') ?>"
+                    class="<?= strpos($current_url, 'dosen/bimbingan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-people"></i> Mahasiswa Bimbingan
+                </a>
+                <a href="<?= base_url('dosen/logbook') ?>"
+                    class="<?= strpos($current_url, 'dosen/logbook') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-journal-text"></i> Review Logbook
+                </a>
+                <a href="<?= base_url('dosen/laporan') ?>"
+                    class="<?= strpos($current_url, 'dosen/laporan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-check"></i> Review Laporan
+                </a>
+                <a href="<?= base_url('dosen/jadwal') ?>"
+                    class="<?= strpos($current_url, 'dosen/jadwal') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-calendar"></i> Jadwal Desiminasi
+                </a>
+                <div class="menu-header">Penguji</div>
+                <a href="<?= base_url('penguji/konfirmasi') ?>"
+                    class="<?= strpos($current_url, 'penguji/konfirmasi') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-check2-circle"></i> Konfirmasi Menguji
+                </a>
+                <a href="<?= base_url('penguji/jadwal') ?>"
+                    class="<?= strpos($current_url, 'penguji/jadwal') !== false || strpos($current_url, 'penguji/input_hasil') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-calendar-check"></i> Jadwal Menguji
+                </a>
+                <a href="<?= base_url('penguji/laporan') ?>"
+                    class="<?= strpos($current_url, 'penguji/laporan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-check"></i> ACC Laporan Akhir
+                </a>
 
-            <?php elseif ($role_id == 3): // Sekretaris ?>
+            <?php elseif ($active_role == 'sekretaris'): ?>
                 <a href="<?= base_url('dashboard/sekretaris') ?>"
                     class="<?= strpos($current_url, 'dashboard/sekretaris') !== false ? 'active' : '' ?>">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
                 <div class="menu-header">Administrasi</div>
+                <a href="<?= base_url('admin/mahasiswa') ?>"
+                    class="<?= strpos($current_url, 'admin/mahasiswa') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-mortarboard"></i> Data Mahasiswa
+                </a>
                 <a href="<?= base_url('admin/dpl') ?>"
                     class="<?= strpos($current_url, 'admin/dpl') !== false ? 'active' : '' ?>">
                     <i class="bi bi-person-plus"></i> Penugasan DPL
@@ -447,12 +536,7 @@
                     class="<?= strpos($current_url, 'admin/sebaran') !== false ? 'active' : '' ?>">
                     <i class="bi bi-geo-alt"></i> Sebaran Magang
                 </a>
-
-            <?php elseif ($role_id == 4): // DPL ?>
-                <a href="<?= base_url('dashboard/dosen') ?>"
-                    class="<?= strpos($current_url, 'dashboard/dosen') !== false ? 'active' : '' ?>">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
+                <div class="menu-header">Pembimbing</div>
                 <a href="<?= base_url('dosen/bimbingan') ?>"
                     class="<?= strpos($current_url, 'dosen/bimbingan') !== false ? 'active' : '' ?>">
                     <i class="bi bi-people"></i> Mahasiswa Bimbingan
@@ -469,19 +553,50 @@
                     class="<?= strpos($current_url, 'dosen/jadwal') !== false ? 'active' : '' ?>">
                     <i class="bi bi-calendar"></i> Jadwal Desiminasi
                 </a>
-
-            <?php elseif ($role_id == 6): // Penguji ?>
-                <a href="<?= base_url('dashboard/penguji') ?>"
-                    class="<?= strpos($current_url, 'dashboard/penguji') !== false ? 'active' : '' ?>">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
+                <div class="menu-header">Penguji</div>
                 <a href="<?= base_url('penguji/konfirmasi') ?>"
                     class="<?= strpos($current_url, 'penguji/konfirmasi') !== false ? 'active' : '' ?>">
                     <i class="bi bi-check2-circle"></i> Konfirmasi Menguji
                 </a>
                 <a href="<?= base_url('penguji/jadwal') ?>"
-                    class="<?= strpos($current_url, 'penguji/jadwal') !== false ? 'active' : '' ?>">
-                    <i class="bi bi-calendar-event"></i> Jadwal Desiminasi
+                    class="<?= strpos($current_url, 'penguji/jadwal') !== false || strpos($current_url, 'penguji/input_hasil') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-calendar-check"></i> Jadwal Menguji
+                </a>
+                <a href="<?= base_url('penguji/laporan') ?>"
+                    class="<?= strpos($current_url, 'penguji/laporan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-check"></i> ACC Laporan Akhir
+                </a>
+
+            <?php elseif ($active_role == 'dosen'): ?>
+                <a href="<?= base_url('dashboard/dosen') ?>"
+                    class="<?= strpos($current_url, 'dashboard/dosen') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <div class="menu-header">Pembimbing</div>
+                <a href="<?= base_url('dosen/bimbingan') ?>"
+                    class="<?= strpos($current_url, 'dosen/bimbingan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-people"></i> Mahasiswa Bimbingan
+                </a>
+                <a href="<?= base_url('dosen/logbook') ?>"
+                    class="<?= strpos($current_url, 'dosen/logbook') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-journal-text"></i> Review Logbook
+                </a>
+                <a href="<?= base_url('dosen/laporan') ?>"
+                    class="<?= strpos($current_url, 'dosen/laporan') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-check"></i> Review Laporan
+                </a>
+                <a href="<?= base_url('dosen/jadwal') ?>"
+                    class="<?= strpos($current_url, 'dosen/jadwal') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-calendar"></i> Jadwal Desiminasi
+                </a>
+                <div class="menu-header">Penguji</div>
+                <a href="<?= base_url('penguji/konfirmasi') ?>"
+                    class="<?= strpos($current_url, 'penguji/konfirmasi') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-check2-circle"></i> Konfirmasi Menguji
+                </a>
+                <a href="<?= base_url('penguji/jadwal') ?>"
+                    class="<?= strpos($current_url, 'penguji/jadwal') !== false || strpos($current_url, 'penguji/input_hasil') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-calendar-check"></i> Jadwal Menguji
                 </a>
                 <a href="<?= base_url('penguji/laporan') ?>"
                     class="<?= strpos($current_url, 'penguji/laporan') !== false ? 'active' : '' ?>">
@@ -512,7 +627,8 @@
                 </div>
                 <div>
                     <div class="fw-semibold" style="font-size: 0.875rem">
-                        <?= $this->session->userdata('nama_lengkap') ?? 'User' ?></div>
+                        <?= $this->session->userdata('nama_lengkap') ?? 'User' ?>
+                    </div>
                     <small class="text-muted"><?= $this->session->userdata('role_nama') ?? '' ?></small>
                 </div>
             </div>

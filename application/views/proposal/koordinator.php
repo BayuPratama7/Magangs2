@@ -27,7 +27,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $no = 1; foreach ($proposals as $p): ?>
+                        <?php $no = 1;
+                        foreach ($proposals as $p): ?>
                             <tr>
                                 <td><?= $no++ ?></td>
                                 <td>
@@ -51,40 +52,14 @@
                                 </td>
                                 <td>
                                     <?php if ($p->status_koordinator == 'menunggu'): ?>
-                                        <a href="<?= base_url('koordinator/acc/' . $p->proposal_id) ?>" 
-                                           class="btn btn-sm btn-success"
-                                           onclick="return confirm('Setujui proposal ini?')">
+                                        <a href="<?= base_url('koordinator/acc/' . $p->proposal_id) ?>"
+                                            class="btn btn-sm btn-success" onclick="return confirm('Setujui proposal ini?')">
                                             <i class="bi bi-check-circle me-1"></i>ACC
                                         </a>
-                                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" 
-                                                data-bs-target="#rejectModal<?= $p->proposal_id ?>">
+                                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                            data-bs-target="#rejectModal<?= $p->proposal_id ?>">
                                             <i class="bi bi-x-circle me-1"></i>Tolak
                                         </button>
-                                        
-                                        <!-- Reject Modal -->
-                                        <div class="modal fade" id="rejectModal<?= $p->proposal_id ?>" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Tolak Proposal</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <form method="post" action="<?= base_url('koordinator/reject/' . $p->proposal_id) ?>">
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Alasan Penolakan</label>
-                                                                <textarea name="catatan" class="form-control" rows="3" 
-                                                                          placeholder="Jelaskan alasan penolakan..." required></textarea>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                            <button type="submit" class="btn btn-danger">Tolak Proposal</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
                                     <?php else: ?>
                                         <span class="text-muted">Sudah diproses</span>
                                     <?php endif; ?>
@@ -102,3 +77,34 @@
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Modals di luar table agar tidak ngeblink -->
+<?php if (!empty($proposals)): ?>
+    <?php foreach ($proposals as $p): ?>
+        <?php if ($p->status_koordinator == 'menunggu'): ?>
+            <div class="modal fade" id="rejectModal<?= $p->proposal_id ?>" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tolak Proposal</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="post" action="<?= base_url('koordinator/reject/' . $p->proposal_id) ?>">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Alasan Penolakan</label>
+                                    <textarea name="catatan" class="form-control" rows="3"
+                                        placeholder="Jelaskan alasan penolakan..." required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-danger">Tolak Proposal</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>

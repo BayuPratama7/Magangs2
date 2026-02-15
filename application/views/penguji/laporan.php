@@ -48,41 +48,14 @@
                                 </td>
                                 <td>
                                     <?php if ($l->link_laporan_akhir && $l->status_laporan_akhir != 'disetujui'): ?>
-                                        <a href="<?= base_url('penguji/laporan_acc/' . $l->hasil_id) ?>"
-                                            class="btn btn-sm btn-success" onclick="return confirm('ACC laporan akhir ini?')">
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#accModal<?= $l->hasil_id ?>">
                                             <i class="bi bi-check"></i> ACC
-                                        </a>
+                                        </button>
                                         <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                             data-bs-target="#revisiModal<?= $l->hasil_id ?>">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-
-                                        <!-- Revisi Modal -->
-                                        <div class="modal fade" id="revisiModal<?= $l->hasil_id ?>" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Minta Revisi</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <form method="post"
-                                                        action="<?= base_url('penguji/laporan_revisi/' . $l->hasil_id) ?>">
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Catatan Revisi</label>
-                                                                <textarea name="catatan_revisi" class="form-control" rows="4"
-                                                                    required></textarea>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">Batal</button>
-                                                            <button type="submit" class="btn btn-warning">Minta Revisi</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
                                     <?php elseif ($l->status_laporan_akhir == 'disetujui'): ?>
                                         <span class="badge bg-success"><i class="bi bi-check"></i> Sudah ACC</span>
                                     <?php else: ?>
@@ -102,3 +75,99 @@
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Modals di luar table agar tidak ngeblink -->
+<?php if (!empty($laporan)): ?>
+    <?php foreach ($laporan as $l): ?>
+        <?php if ($l->link_laporan_akhir && $l->status_laporan_akhir != 'disetujui'): ?>
+            <!-- Modal ACC -->
+            <div class="modal fade" id="accModal<?= $l->hasil_id ?>" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Konfirmasi ACC Laporan</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-file-earmark-check display-4 text-success"></i>
+                            </div>
+                            <div class="card bg-light mb-3">
+                                <div class="card-body py-2">
+                                    <table class="table table-borderless table-sm mb-0">
+                                        <tr>
+                                            <td width="100"><strong>NIM</strong></td>
+                                            <td><?= $l->nim ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Nama</strong></td>
+                                            <td><?= $l->nama_mahasiswa ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Judul</strong></td>
+                                            <td><?= $l->judul_proposal ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Laporan</strong></td>
+                                            <td>
+                                                <a href="<?= $l->link_laporan_akhir ?>" target="_blank" class="text-primary">
+                                                    <i class="bi bi-box-arrow-up-right me-1"></i>Lihat Laporan
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <p class="text-center text-muted mb-0">
+                                Apakah Anda yakin ingin <strong>menyetujui (ACC)</strong> laporan akhir mahasiswa ini?
+                                Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x me-1"></i>Batal
+                            </button>
+                            <a href="<?= base_url('penguji/laporan_acc/' . $l->hasil_id) ?>" class="btn btn-success">
+                                <i class="bi bi-check-circle me-1"></i>Ya, ACC Laporan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Revisi -->
+            <div class="modal fade" id="revisiModal<?= $l->hasil_id ?>" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning">
+                            <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Minta Revisi Laporan</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="post" action="<?= base_url('penguji/laporan_revisi/' . $l->hasil_id) ?>">
+                            <div class="modal-body">
+                                <div class="card bg-light mb-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">Mahasiswa</small>
+                                        <p class="mb-0"><strong><?= $l->nama_mahasiswa ?></strong> (<?= $l->nim ?>)</p>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Catatan Revisi</strong></label>
+                                    <textarea name="catatan_revisi" class="form-control" rows="4"
+                                        placeholder="Jelaskan bagian mana yang perlu diperbaiki..." required></textarea>
+                                    <small class="text-muted">Catatan ini akan ditampilkan ke mahasiswa</small>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-send me-1"></i>Kirim Revisi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>

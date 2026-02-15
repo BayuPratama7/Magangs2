@@ -1,0 +1,149 @@
+@startuml ActivityDiagram
+title Activity Diagram\nAlur Proses Bisnis Magang - Sistem Pengelolaan Magang
+
+|Mahasiswa|
+start
+:Login ke Sistem;
+
+|Mahasiswa|
+:Input Proposal Magang\n(Judul, Instansi, Link Drive);
+
+|Koordinator Magang|
+:Review Proposal Mahasiswa;
+if (ACC Koordinator?) then (Disetujui)
+else (Ditolak)
+    |Mahasiswa|
+    :Menerima Notifikasi Ditolak;
+    :Revisi & Submit Ulang Proposal;
+    |Koordinator Magang|
+    :Review Ulang Proposal;
+endif
+
+|Kaprodi|
+:Review Proposal\n(Setelah ACC Koordinator);
+if (ACC Kaprodi?) then (Disetujui)
+else (Ditolak)
+    |Mahasiswa|
+    :Menerima Notifikasi Ditolak;
+    stop
+endif
+
+|Sekretaris Prodi|
+:Assign Dosen Pembimbing\nLapangan (DPL);
+:Buat & Terbitkan\nSurat Pengantar Magang;
+note right: Opsional: Mahasiswa\ninput Surat Penerimaan\ndari Perusahaan
+
+|Mahasiswa|
+:Mendapatkan Surat Pengantar;
+:Mulai Kegiatan Magang;
+
+' --- LOGBOOK LOOP ---
+partition "Periode Magang (3 Bulan)" {
+    |Mahasiswa|
+    :Input Logbook Bulan 1\n(Link Drive);
+
+    |Dosen|
+    :Review Logbook Bulan 1;
+
+    |Mahasiswa|
+    :Input Logbook Bulan 2\n(Link Drive);
+
+    |Dosen|
+    :Review Logbook Bulan 2;
+
+    |Mahasiswa|
+    :Input Logbook Bulan 3\n(Link Drive);
+
+    |Dosen|
+    :Review Logbook Bulan 3;
+}
+
+' --- LAPORAN ---
+|Mahasiswa|
+:Input Laporan Magang\n(Link Drive);
+
+|Dosen|
+:Review Laporan Magang;
+if (ACC DPL?) then (Disetujui)
+    :Set is_acc_desiminasi = TRUE;
+else (Revisi)
+    |Mahasiswa|
+    :Revisi Laporan;
+    :Submit Ulang Laporan;
+    |Dosen|
+    :Review Ulang;
+endif
+
+' --- DESIMINASI ---
+|Mahasiswa|
+:Ajukan Desiminasi\n(Setelah ACC DPL);
+
+|Sekretaris Prodi|
+:Lihat Pengajuan Desiminasi;
+if (Terima Pengajuan?) then (Diterima)
+    :Assign Penguji Desiminasi;
+    :Input Jadwal Desiminasi\n(Tanggal, Waktu, Ruangan);
+else (Ditolak)
+    |Mahasiswa|
+    :Menerima Notifikasi Ditolak;
+    stop
+endif
+
+|Dosen|
+:Konfirmasi Kesediaan Menguji;
+if (Bersedia?) then (Ya)
+    :Jadwal Terkonfirmasi;
+else (Tidak)
+    |Sekretaris Prodi|
+    :Assign Penguji Lain;
+    |Dosen|
+    :Konfirmasi Ulang;
+endif
+
+' --- PELAKSANAAN DESIMINASI ---
+|Mahasiswa|
+:Melaksanakan Desiminasi;
+
+|Dosen|
+:Input Hasil Desiminasi\n(Nilai, Status Kelulusan);
+if (Lulus?) then (Lulus / Lulus Bersyarat)
+    :Berikan Catatan Revisi;
+else (Tidak Lulus)
+    |Mahasiswa|
+    :Menerima Notifikasi Tidak Lulus;
+    stop
+endif
+
+' --- LAPORAN AKHIR ---
+|Mahasiswa|
+:Revisi Sesuai Catatan Penguji;
+:Upload Laporan Akhir\n(Link Drive);
+
+|Dosen|
+:Review Laporan Akhir;
+if (ACC Laporan Akhir?) then (Disetujui)
+    :ACC Laporan Akhir;
+else (Revisi)
+    |Mahasiswa|
+    :Revisi Ulang Laporan Akhir;
+    :Upload Ulang;
+    |Dosen|
+    :Review Ulang;
+endif
+
+|Mahasiswa|
+:Lihat Hasil Desiminasi\n(Status: Selesai);
+:Magang Selesai;
+
+|Koordinator Magang|
+:Lihat Hasil Desiminasi\nSemua Mahasiswa;
+
+|Kaprodi|
+:Lihat Hasil Desiminasi\nSemua Mahasiswa;
+
+|Sekretaris Prodi|
+:Lihat Hasil Desiminasi\nSemua Mahasiswa;
+
+stop
+
+@enduml

@@ -118,8 +118,16 @@
 
                         <?php if ($hasil->catatan_revisi): ?>
                             <hr>
-                            <h6><i class="bi bi-chat-text me-2"></i>Catatan Revisi dari Penguji:</h6>
+                            <h6><i class="bi bi-chat-text me-2"></i>Catatan Revisi Desiminasi:</h6>
                             <p class="bg-light p-3 rounded"><?= nl2br($hasil->catatan_revisi) ?></p>
+                        <?php endif; ?>
+
+                        <?php if (!empty($hasil->catatan_penguji)): ?>
+                            <?php if (empty($hasil->catatan_revisi)): ?><hr><?php endif; ?>
+                            <h6><i class="bi bi-pencil-square me-2"></i>Catatan Revisi Laporan dari Penguji:</h6>
+                            <div class="alert alert-warning py-2 mb-0">
+                                <?= nl2br($hasil->catatan_penguji) ?>
+                            </div>
                         <?php endif; ?>
 
                         <!-- Upload Laporan Akhir -->
@@ -149,6 +157,14 @@
                                 <i class="bi bi-exclamation-triangle me-2"></i>
                                 <strong>Revisi Diperlukan!</strong> Silakan upload ulang laporan akhir.
                             </div>
+                            <?php if (!empty($hasil->catatan_penguji)): ?>
+                                <div class="card bg-light mb-3">
+                                    <div class="card-body py-2">
+                                        <h6 class="mb-1"><i class="bi bi-pencil-square me-2"></i>Catatan Revisi dari Penguji:</h6>
+                                        <p class="mb-0"><?= nl2br($hasil->catatan_penguji) ?></p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                             <h6><i class="bi bi-upload me-2"></i>Upload Laporan Akhir (Revisi)</h6>
                             <form method="post" action="<?= base_url('desiminasi/upload_laporan_akhir') ?>">
                                 <div class="mb-3">

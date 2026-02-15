@@ -56,11 +56,15 @@ class Sekretaris extends CI_Controller
         $stats->total_mitra = $this->Dashboard_model->count_mitra();
         $stats->total_sebaran = $this->db->count_all('sebaran_magang');
 
+        // Get sebaran jenis magang
+        $sebaran_jenis = $this->Dashboard_model->get_sebaran_by_jenis();
+
         $data = [
             'page_title' => 'Dashboard Sekretaris',
             'pending_dpl' => $pending_dpl,
             'upcoming_jadwal' => $upcoming_jadwal,
-            'stats' => $stats
+            'stats' => $stats,
+            'sebaran_jenis' => $sebaran_jenis
         ];
 
         $data['content'] = $this->load->view('dashboard/sekretaris_content', $data, TRUE);

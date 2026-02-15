@@ -14,7 +14,8 @@ class Koordinator extends CI_Controller
             'Logbook_model',
             'Mahasiswa_model',
             'Desiminasi_model',
-            'Administrasi_model'
+            'Administrasi_model',
+            'Dashboard_model'
         ]);
     }
 
@@ -59,13 +60,17 @@ class Koordinator extends CI_Controller
             ->where('status_laporan_akhir', 'disetujui')
             ->count_all_results('hasil_desiminasi');
 
+        // Get sebaran jenis magang
+        $sebaran_jenis = $this->Dashboard_model->get_sebaran_by_jenis();
+
         $data = [
             'page_title' => 'Dashboard Koordinator',
             'pending_proposals' => $pending_proposals,
             'recent_logbooks' => $recent_logbooks,
             'recent_hasil' => $recent_hasil,
             'mahasiswa_progress' => $mahasiswa_progress,
-            'stats' => $stats
+            'stats' => $stats,
+            'sebaran_jenis' => $sebaran_jenis
         ];
 
         $data['content'] = $this->load->view('dashboard/koordinator_content', $data, TRUE);

@@ -110,6 +110,8 @@
             </div>
             <div class="card-body">
                 <?php if (isset($sebaran_jenis) && !empty($sebaran_jenis)): ?>
+                    <canvas id="sebaranChartKaprodi" style="max-height: 200px;"></canvas>
+                    <hr class="my-3">
                     <?php
                     $colors = ['reguler' => 'primary', 'bumn' => 'success', 'mbkm' => 'warning'];
                     foreach ($sebaran_jenis as $s):
@@ -122,6 +124,33 @@
                             <strong><?= $s->total ?></strong>
                         </div>
                     <?php endforeach; ?>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const ctxKaprodi = document.getElementById('sebaranChartKaprodi').getContext('2d');
+                            new Chart(ctxKaprodi, {
+                                type: 'pie',
+                                data: {
+                                    labels: [<?php foreach ($sebaran_jenis as $s): ?>'<?= strtoupper($s->jenis_magang) ?>',<?php endforeach; ?>],
+                                    datasets: [{
+                                        data: [<?php foreach ($sebaran_jenis as $s): ?><?= $s->total ?>,<?php endforeach; ?>],
+                                        backgroundColor: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
+                                        borderWidth: 2,
+                                        borderColor: '#fff'
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: true,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom',
+                                            labels: { padding: 15, usePointStyle: true }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
                 <?php else: ?>
                     <p class="text-muted mb-0">Data belum tersedia</p>
                 <?php endif; ?>

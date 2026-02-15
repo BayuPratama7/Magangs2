@@ -1,0 +1,175 @@
+@startuml SequenceDiagram
+title Sequence Diagram\nSistem Pengelolaan Magang Prodi Sistem Informasi
+
+skinparam sequenceArrowThickness 2
+skinparam participantPadding 10
+skinparam boxPadding 5
+
+' =====================================================
+' PARTICIPANTS
+' =====================================================
+actor "Mahasiswa" as MHS
+actor "Koordinator" as KOOR
+actor "Kaprodi" as KPD
+actor "Sekretaris" as SEK
+actor "Dosen" as DSN
+participant "Sistem\nMagang" as SYS
+database "Database\nPostgreSQL" as DB
+
+' =====================================================
+' 1. LOGIN
+' =====================================================
+== Autentikasi ==
+
+MHS -> SYS : POST /auth/process (email, password)
+SYS -> DB : SELECT * FROM users WHERE email = ?
+DB --> SYS : user data
+SYS -> DB : SELECT roles FROM user_roles WHERE user_id = ?
+DB --> SYS : roles array
+SYS -> SYS : Verify password\n& determine active_role
+SYS --> MHS : Redirect ke Dashboard sesuai role
+
+' =====================================================
+' 2. PROPOSAL MAGANG
+' =====================================================
+== Pengajuan Proposal Magang ==
+
+MHS -> SYS : Input Proposal\n(judul, instansi, link_proposal)
+SYS -> DB : INSERT INTO proposal_magang
+DB --> SYS : proposal_id
+SYS --> MHS : Proposal berhasil diajukan\n(status: menunggu)
+
+...Koordinator login & cek proposal...
+
+KOOR -> SYS : GET /koordinator (Lihat daftar proposal)
+SYS -> DB : SELECT proposal WHERE status_koordinator = 'menunggu'
+DB --> SYS : daftar proposal pending
+SYS --> KOOR : Tampilkan daftar proposal
+
+KOOR -> SYS : POST /koordinator/acc/{id}
+SYS -> DB : UPDATE proposal_magang\nSET status_koordinator = 'disetujui'
+DB --> SYS : OK
+SYS --> KOOR : Proposal di-ACC tahap 1
+
+...Kaprodi login & cek proposal...
+
+KPD -> SYS : GET /proposal/kaprodi (Lihat proposal ACC koordinator)
+SYS -> DB : SELECT proposal\nWHERE status_koordinator = 'disetujui'\nAND status_kaprodi = 'menunggu'
+DB --> SYS : daftar proposal
+SYS --> KPD : Tampilkan proposal
+
+KPD -> SYS : POST /proposal/kaprodi/acc/{id}
+SYS -> DB : UPDATE proposal_magang\nSET status_kaprodi = 'disetujui'
+DB --> SYS : OK
+SYS --> KPD : Proposal di-ACC tahap 2
+
+' =====================================================
+' 3. ADMINISTRASI SEKRETARIS
+' =====================================================
+== Administrasi Sekretaris ==
+
+SEK -> SYS : POST /admin/assign_dpl\n(mahasiswa_id, dosen_id)
+SYS -> DB : UPDATE mahasiswa\nSET dosen_dpl_id = ?
+DB --> SYS : OK
+SYS --> SEK : DPL berhasil ditugaskan
+
+SEK -> SYS : POST /admin/create_surat\n(proposal_id, nomor_surat)
+SYS -> DB : INSERT INTO surat_pengantar
+DB --> SYS : surat_id
+SYS --> SEK : Surat pengantar berhasil dibuat
+
+' =====================================================
+' 4. LOGBOOK
+' =====================================================
+== Periode Magang - Logbook ==
+
+loop 3 kali (Bulan 1, 2, 3)
+    MHS -> SYS : POST /logbook/store\n(bulan_ke, link_logbook)
+    SYS -> DB : INSERT INTO logbook_magang
+    DB --> SYS : logbook_id
+    SYS --> MHS : Logbook berhasil diupload
+
+    DSN -> SYS : GET /dosen/logbook (Review logbook)
+    SYS -> DB : SELECT logbook WHERE dosen_dpl_id = ?
+    DB --> SYS : daftar logbook
+    SYS --> DSN : Tampilkan logbook
+
+    DSN -> SYS : POST /dosen/logbook_review/{id}/sudah_review
+    SYS -> DB : UPDATE logbook_magang\nSET status_dpl = 'sudah_review'
+    DB --> SYS : OK
+    SYS --> DSN : Logbook berhasil direview
+end
+
+' =====================================================
+' 5. LAPORAN MAGANG
+' =====================================================
+== Laporan Magang ==
+
+MHS -> SYS : POST /laporan/store (link_laporan)
+SYS -> DB : INSERT INTO laporan_magang\n(jenis_laporan = 'draft')
+DB --> SYS : laporan_id
+SYS --> MHS : Laporan berhasil diupload
+
+DSN -> SYS : POST /dosen/laporan_acc/{id}
+SYS -> DB : UPDATE laporan_magang\nSET status_dpl = 'disetujui',\nis_acc_desiminasi = TRUE
+DB --> SYS : OK
+SYS --> DSN : Laporan di-ACC, siap desiminasi
+
+' =====================================================
+' 6. DESIMINASI
+' =====================================================
+== Pengajuan & Proses Desiminasi ==
+
+MHS -> SYS : POST /desiminasi/store\n(laporan_id)
+SYS -> DB : INSERT INTO desiminasi\n(status_pengajuan = 'menunggu')
+DB --> SYS : desiminasi_id
+SYS --> MHS : Desiminasi berhasil diajukan
+
+SEK -> SYS : GET /sekretaris/desiminasi\n(Lihat pengajuan pending)
+SYS -> DB : SELECT desiminasi\nWHERE status_pengajuan = 'menunggu'
+DB --> SYS : daftar pengajuan
+SYS --> SEK : Tampilkan pengajuan
+
+SEK -> SYS : POST /sekretaris/desiminasi/simpan\n(penguji_id, tanggal, waktu, ruangan)
+SYS -> DB : UPDATE desiminasi SET penguji_id,\nstatus = 'diterima'
+SYS -> DB : INSERT INTO jadwal_desiminasi
+SYS -> DB : INSERT INTO hasil_desiminasi
+DB --> SYS : OK (transaction complete)
+SYS --> SEK : Jadwal & penguji berhasil disimpan
+
+' =====================================================
+' 7. PENGUJI KONFIRMASI & INPUT HASIL
+' =====================================================
+== Konfirmasi & Pelaksanaan Desiminasi ==
+
+DSN -> SYS : POST /penguji/konfirmasi_terima/{id}
+SYS -> DB : UPDATE desiminasi\nSET konfirmasi_penguji = 'bersedia'
+DB --> SYS : OK
+SYS --> DSN : Konfirmasi berhasil
+
+DSN -> SYS : POST /penguji/simpan_hasil/{id}\n(nilai, status_kelulusan, catatan)
+SYS -> DB : UPDATE hasil_desiminasi\nSET nilai, status_kelulusan
+DB --> SYS : OK
+SYS --> DSN : Hasil desiminasi tersimpan
+
+' =====================================================
+' 8. LAPORAN AKHIR
+' =====================================================
+== Upload & ACC Laporan Akhir ==
+
+MHS -> SYS : POST /desiminasi/upload_laporan_akhir\n(link_laporan_akhir)
+SYS -> DB : UPDATE hasil_desiminasi\nSET link_laporan_akhir = ?
+DB --> SYS : OK
+SYS --> MHS : Laporan akhir berhasil diupload
+
+DSN -> SYS : POST /penguji/laporan_acc/{id}
+SYS -> DB : UPDATE hasil_desiminasi\nSET status_laporan_akhir = 'disetujui'
+DB --> SYS : OK
+SYS --> DSN : Laporan akhir di-ACC
+
+MHS -> SYS : GET /desiminasi (Lihat status)
+SYS -> DB : SELECT hasil_desiminasi\nWHERE mahasiswa_id = ?
+DB --> SYS : hasil (status: disetujui)
+SYS --> MHS : Menampilkan hasil desiminasi\n(MAGANG SELESAI)
+
+@enduml

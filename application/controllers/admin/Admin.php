@@ -20,6 +20,172 @@ class Admin extends CI_Controller
     }
 
     // ==========================================
+    // DATA MAHASISWA
+    // ==========================================
+
+    public function mahasiswa()
+    {
+        $this->load->model('User_model');
+        $mahasiswa_list = $this->Mahasiswa_model->get_all_with_proposal();
+
+        $data = [
+            'page_title' => 'Data Mahasiswa',
+            'mahasiswa_list' => $mahasiswa_list
+        ];
+
+        $data['content'] = $this->load->view('admin/mahasiswa', $data, TRUE);
+        $this->load->view('layouts/main', $data);
+    }
+
+    public function mahasiswa_store()
+    {
+        $this->load->model('User_model');
+
+        // Cek NIM sudah ada
+        $existing = $this->Mahasiswa_model->get_by_nim($this->input->post('nim'));
+        if ($existing) {
+            $this->session->set_flashdata('error', 'NIM sudah terdaftar dalam sistem');
+            redirect('admin/mahasiswa');
+            return;
+        }
+
+        // Cek email sudah ada
+        $email = $this->input->post('email');
+        $email_exists = $this->db->get_where('users', ['email' => $email])->row();
+        if ($email_exists) {
+            $this->session->set_flashdata('error', 'Email sudah terdaftar dalam sistem');
+            redirect('admin/mahasiswa');
+            return;
+        }
+
+        // Buat user account dulu
+        $password = password_hash($this->input->post('password'), PASSWORD_DEFAULT);
+
+        $user_data = [
+            'email' => $email,
+            'password' => $password,
+            'nama_lengkap' => $this->input->post('nama_mahasiswa'),
+            'role_id' => 5, // Mahasiswa
+            'is_active' => TRUE,
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+        $this->db->insert('users', $user_data);
+        $user_id = $this->db->insert_id();
+
+        if (!$user_id) {
+            $this->session->set_flashdata('error', 'Gagal membuat akun user');
+            redirect('admin/mahasiswa');
+            return;
+        }
+
+        // Insert ke user_roles agar bisa login
+        $this->db->insert('user_roles', [
+            'user_id' => $user_id,
+            'role_id' => 5, // Mahasiswa
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        // Buat data mahasiswa
+        $mhs_data = [
+            'user_id' => $user_id,
+            'nim' => $this->input->post('nim'),
+            'nama_mahasiswa' => $this->input->post('nama_mahasiswa'),
+            'prodi' => $this->input->post('prodi') ?: 'Sistem Informasi',
+            'angkatan' => $this->input->post('angkatan'),
+            'kelas' => $this->input->post('kelas'),
+            'no_hp' => $this->input->post('no_hp'),
+            'alamat' => $this->input->post('alamat'),
+            'status_magang' => 'belum_magang',
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->Mahasiswa_model->insert($mhs_data)) {
+            $this->session->set_flashdata('success', 'Data mahasiswa berhasil ditambahkan');
+        } else {
+            // Rollback user jika gagal insert mahasiswa
+            $this->db->where('user_id', $user_id)->delete('users');
+            $this->session->set_flashdata('error', 'Gagal menambahkan data mahasiswa');
+        }
+
+        redirect('admin/mahasiswa');
+    }
+
+    public function mahasiswa_update($id)
+    {
+        $mahasiswa = $this->Mahasiswa_model->get_by_id($id);
+        if (!$mahasiswa) {
+            $this->session->set_flashdata('error', 'Data mahasiswa tidak ditemukan');
+            redirect('admin/mahasiswa');
+            return;
+        }
+
+        $mhs_data = [
+            'nim' => $this->input->post('nim'),
+            'nama_mahasiswa' => $this->input->post('nama_mahasiswa'),
+            'prodi' => $this->input->post('prodi'),
+            'angkatan' => $this->input->post('angkatan'),
+            'kelas' => $this->input->post('kelas'),
+            'no_hp' => $this->input->post('no_hp'),
+            'alamat' => $this->input->post('alamat'),
+            'status_magang' => $this->input->post('status_magang')
+        ];
+
+        if ($this->Mahasiswa_model->update($id, $mhs_data)) {
+            // Update juga nama di tabel users
+            $this->db->where('user_id', $mahasiswa->user_id)
+                     ->update('users', [
+                         'nama_lengkap' => $this->input->post('nama_mahasiswa'),
+                         'updated_at' => date('Y-m-d H:i:s')
+                     ]);
+
+            $this->session->set_flashdata('success', 'Data mahasiswa berhasil diperbarui');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal memperbarui data mahasiswa');
+        }
+
+        redirect('admin/mahasiswa');
+    }
+
+    public function mahasiswa_delete($id)
+    {
+        $mahasiswa = $this->Mahasiswa_model->get_by_id($id);
+        if (!$mahasiswa) {
+            $this->session->set_flashdata('error', 'Data mahasiswa tidak ditemukan');
+            redirect('admin/mahasiswa');
+            return;
+        }
+
+        // Hapus semua data terkait mahasiswa (foreign key dependencies)
+        $this->db->trans_start();
+
+        $this->db->where('mahasiswa_id', $id)->delete('hasil_desiminasi');
+        $this->db->where('mahasiswa_id', $id)->delete('jadwal_desiminasi');
+        $this->db->where('mahasiswa_id', $id)->delete('desiminasi');
+        $this->db->where('mahasiswa_id', $id)->delete('laporan_magang');
+        $this->db->where('mahasiswa_id', $id)->delete('logbook_magang');
+        $this->db->where('mahasiswa_id', $id)->delete('surat_pengantar');
+        $this->db->where('mahasiswa_id', $id)->delete('proposal_magang');
+
+        // Hapus data mahasiswa
+        $this->Mahasiswa_model->delete($id);
+
+        // Hapus user_roles dan user account
+        $this->db->where('user_id', $mahasiswa->user_id)->delete('user_roles');
+        $this->db->where('user_id', $mahasiswa->user_id)->delete('users');
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status()) {
+            $this->session->set_flashdata('success', 'Data mahasiswa dan semua data terkait berhasil dihapus');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal menghapus data mahasiswa');
+        }
+
+        redirect('admin/mahasiswa');
+    }
+
+    // ==========================================
     // PENUGASAN DPL
     // ==========================================
 

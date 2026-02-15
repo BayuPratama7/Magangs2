@@ -99,7 +99,7 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <?php if ($l->is_acc_desiminasi): ?>
+                                                <?php if ($l->is_acc_desiminasi === true || $l->is_acc_desiminasi === 't' || $l->is_acc_desiminasi === '1'): ?>
                                                     <span class="badge bg-success"><i class="bi bi-check"></i> Ya</span>
                                                 <?php else: ?>
                                                     <span class="badge bg-secondary">Belum</span>
