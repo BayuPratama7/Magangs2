@@ -327,9 +327,63 @@
                     <div class="alert alert-warning mt-2">
                         <i class="bi bi-exclamation-circle me-2"></i>
                         Silahkan mengajukan proposal kembali
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-sm btn-warning ms-2">
-                            <i class="bi bi-arrow-right me-1"></i>Ke Pengajuan Proposal
-                        </a>
+                    </div>
+
+                    <!-- Form Ajukan Proposal Baru -->
+                    <div class="card mt-3">
+                        <div class="card-header bg-warning text-dark">
+                            <i class="bi bi-file-earmark-plus me-2"></i>Pengajuan Proposal Baru
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">Silakan isi data proposal untuk mengajukan ke mitra lain</p>
+                            <form method="post" action="<?= base_url('proposal/store') ?>">
+                                <div class="mb-3">
+                                    <label class="form-label">Judul Proposal</label>
+                                    <input type="text" name="judul_proposal" class="form-control" required
+                                        placeholder="Masukkan judul proposal magang">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Instansi Tujuan Magang</label>
+                                    <input type="text" name="instansi_tujuan" class="form-control" required
+                                        placeholder="Nama instansi/perusahaan">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Jenis Magang</label>
+                                        <select name="jenis_magang" class="form-select" required>
+                                            <option value="">-- Pilih Jenis Magang --</option>
+                                            <option value="reguler">Reguler</option>
+                                            <option value="bumn">BUMN</option>
+                                            <option value="mbkm">MBKM</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Tanggal Pengajuan</label>
+                                        <input type="date" name="tanggal_pengajuan" class="form-control" required
+                                            value="<?= date('Y-m-d') ?>">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Alamat Instansi</label>
+                                    <textarea name="alamat_instansi" class="form-control" rows="2"
+                                        placeholder="Alamat lengkap instansi"></textarea>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">Link Proposal (Google Drive)</label>
+                                    <input type="url" name="link_proposal" class="form-control" required
+                                        placeholder="https://drive.google.com/...">
+                                    <small class="text-muted">Upload proposal Anda ke Google Drive lalu paste linknya di sini</small>
+                                </div>
+
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-send me-1"></i>Ajukan Proposal Baru
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 <?php endif; ?>
 

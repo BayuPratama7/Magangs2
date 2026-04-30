@@ -73,15 +73,26 @@ class Proposal extends CI_Controller
             ->get_by_mahasiswa($mahasiswa->mahasiswa_id);
 
         if ($existing) {
-            $this->session->set_flashdata('error', 'Proposal sudah pernah diajukan');
-            redirect('proposal');
-            return;
-        }
+            // Allow new proposal only if mitra rejected the previous one
+            if ($existing->status_mitra != 'ditolak') {
+                $this->session->set_flashdata('error', 'Proposal sudah pernah diajukan');
+                redirect('proposal');
+                return;
+            }
 
-        if ($this->Proposal_model->insert($data)) {
-            $this->session->set_flashdata('success', 'Proposal berhasil diajukan');
+            // Replace old proposal with new one
+            if ($this->Proposal_model->update($existing->proposal_id, $data)) {
+                $this->session->set_flashdata('success', 'Proposal baru berhasil diajukan');
+            } else {
+                $this->session->set_flashdata('error', 'Proposal gagal diajukan');
+            }
         } else {
-            $this->session->set_flashdata('error', 'Proposal gagal diajukan');
+            // Insert new proposal
+            if ($this->Proposal_model->insert($data)) {
+                $this->session->set_flashdata('success', 'Proposal berhasil diajukan');
+            } else {
+                $this->session->set_flashdata('error', 'Proposal gagal diajukan');
+            }
         }
 
         redirect('proposal');
