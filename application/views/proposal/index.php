@@ -324,13 +324,12 @@
                         Selamat! Mitra telah menerima aplikasi magang Anda. DPL sedang dalam proses penugasan.
                     </div>
                 <?php elseif ($proposal->status_mitra == 'ditolak'): ?>
-                    <div class="alert alert-danger">
-                        <i class="bi bi-x-circle me-2"></i>
-                        Mohon maaf, mitra belum dapat menerima aplikasi Anda. Silakan ajukan ke mitra lain.
-                    </div>
                     <div class="alert alert-warning mt-2">
                         <i class="bi bi-exclamation-circle me-2"></i>
-                        Silahkan upload proposal kembali ke mitra lain.
+                        Silahkan mengajukan proposal kembali
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-sm btn-warning ms-2">
+                            <i class="bi bi-arrow-right me-1"></i>Ke Pengajuan Proposal
+                        </a>
                     </div>
                 <?php endif; ?>
 
