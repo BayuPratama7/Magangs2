@@ -328,6 +328,10 @@
                         <i class="bi bi-x-circle me-2"></i>
                         Mohon maaf, mitra belum dapat menerima aplikasi Anda. Silakan ajukan ke mitra lain.
                     </div>
+                    <div class="alert alert-warning mt-2">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        Silahkan upload proposal kembali ke mitra lain.
+                    </div>
                 <?php endif; ?>
 
                 <!-- Form Upload Balasan (hanya jika surat sudah ada) -->
