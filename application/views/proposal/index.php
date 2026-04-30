@@ -138,9 +138,17 @@
                     <th>DPL (Dosen Pembimbing Lapangan)</th>
                     <td>
                         <?php if (isset($mahasiswa) && $mahasiswa->dosen_dpl_id): ?>
-                            <strong><?= $mahasiswa->nama_dosen ?? 'DPL' ?></strong>
-                            <?php if (!empty($mahasiswa->kontak_dosen)): ?>
-                                <br><small class="text-muted">Kontak: <?= htmlspecialchars($mahasiswa->kontak_dosen) ?></small>
+                            <strong><?= $mahasiswa->nama_dpl ?? 'DPL' ?></strong>
+                            <?php if (!empty($mahasiswa->email_dpl) || !empty($mahasiswa->hp_dpl)): ?>
+                                <br><small class="text-muted">
+                                    <?php if (!empty($mahasiswa->email_dpl)): ?>
+                                        Email: <a href="mailto:<?= $mahasiswa->email_dpl ?>"><?= htmlspecialchars($mahasiswa->email_dpl) ?></a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($mahasiswa->hp_dpl)): ?>
+                                        <?php if (!empty($mahasiswa->email_dpl)) echo '<br>'; ?>
+                                        HP: <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $mahasiswa->hp_dpl) ?>" target="_blank"><?= htmlspecialchars($mahasiswa->hp_dpl) ?></a>
+                                    <?php endif; ?>
+                                </small>
                             <?php endif; ?>
                         <?php else: ?>
                             <span class="badge bg-warning">Belum Ditugaskan</span>
