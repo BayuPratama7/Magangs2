@@ -138,15 +138,266 @@
         </div>
     </div>
 
-    <?php if ($proposal->status_kaprodi == 'disetujui'): ?>
-        <div class="alert alert-success mt-3">
-            <i class="bi bi-check-circle me-2"></i>
-            Selamat! Proposal Anda telah disetujui. Silakan lanjutkan ke tahap berikutnya.
-        </div>
-    <?php elseif ($proposal->status_kaprodi == 'ditolak'): ?>
+    <?php if ($proposal->status_koordinator == 'ditolak'): ?>
+        <!-- Ditolak oleh Koordinator -->
         <div class="alert alert-danger mt-3">
             <i class="bi bi-x-circle me-2"></i>
-            Proposal Anda ditolak. Silakan hubungi koordinator untuk informasi lebih lanjut.
+            <strong>Proposal ditolak oleh Koordinator.</strong>
+        </div>
+
+        <?php if (!empty($proposal->catatan_koordinator)): ?>
+            <div class="card mt-3 border-danger">
+                <div class="card-header bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-chat-left-text me-2"></i><strong>Alasan Penolakan dari Koordinator</strong>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0"><?= nl2br(htmlspecialchars($proposal->catatan_koordinator)) ?></p>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- Form Ajukan Ulang -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-arrow-repeat me-2"></i>Ajukan Ulang Proposal
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Perbaiki proposal Anda sesuai catatan di atas, lalu ajukan kembali.</p>
+                <form method="post" action="<?= base_url('proposal/resubmit/' . $proposal->proposal_id) ?>">
+                    <div class="mb-3">
+                        <label class="form-label">Judul Proposal</label>
+                        <input type="text" name="judul_proposal" class="form-control" required
+                            value="<?= htmlspecialchars($proposal->judul_proposal) ?>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Instansi Tujuan Magang</label>
+                        <input type="text" name="instansi_tujuan" class="form-control" required
+                            value="<?= htmlspecialchars($proposal->instansi_tujuan) ?>">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jenis Magang</label>
+                            <select name="jenis_magang" class="form-select" required>
+                                <option value="reguler" <?= $proposal->jenis_magang == 'reguler' ? 'selected' : '' ?>>Reguler</option>
+                                <option value="bumn" <?= $proposal->jenis_magang == 'bumn' ? 'selected' : '' ?>>BUMN</option>
+                                <option value="mbkm" <?= $proposal->jenis_magang == 'mbkm' ? 'selected' : '' ?>>MBKM</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tanggal Pengajuan</label>
+                            <input type="date" name="tanggal_pengajuan" class="form-control" required
+                                value="<?= date('Y-m-d') ?>">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Alamat Instansi</label>
+                        <textarea name="alamat_instansi" class="form-control" rows="2"><?= htmlspecialchars($proposal->alamat_instansi ?? '') ?></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Link Proposal (Google Drive)</label>
+                        <input type="url" name="link_proposal" class="form-control" required
+                            value="<?= htmlspecialchars($proposal->link_proposal) ?>"
+                            placeholder="https://drive.google.com/...">
+                        <small class="text-muted">Upload proposal yang sudah diperbaiki ke Google Drive lalu paste linknya di sini</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-1"></i>Ajukan Ulang
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    <?php elseif ($proposal->status_kaprodi == 'ditolak'): ?>
+        <!-- Ditolak oleh Kaprodi -->
+        <div class="alert alert-danger mt-3">
+            <i class="bi bi-x-circle me-2"></i>
+            <strong>Proposal ditolak oleh Kaprodi.</strong>
+        </div>
+
+        <?php if (!empty($proposal->catatan_kaprodi)): ?>
+            <div class="card mt-3 border-danger">
+                <div class="card-header bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-chat-left-text me-2"></i><strong>Alasan Penolakan dari Kaprodi</strong>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0"><?= nl2br(htmlspecialchars($proposal->catatan_kaprodi)) ?></p>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- Form Ajukan Ulang -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-arrow-repeat me-2"></i>Ajukan Ulang Proposal
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Perbaiki proposal Anda sesuai catatan di atas, lalu ajukan kembali.</p>
+                <form method="post" action="<?= base_url('proposal/resubmit/' . $proposal->proposal_id) ?>">
+                    <div class="mb-3">
+                        <label class="form-label">Judul Proposal</label>
+                        <input type="text" name="judul_proposal" class="form-control" required
+                            value="<?= htmlspecialchars($proposal->judul_proposal) ?>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Instansi Tujuan Magang</label>
+                        <input type="text" name="instansi_tujuan" class="form-control" required
+                            value="<?= htmlspecialchars($proposal->instansi_tujuan) ?>">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jenis Magang</label>
+                            <select name="jenis_magang" class="form-select" required>
+                                <option value="reguler" <?= $proposal->jenis_magang == 'reguler' ? 'selected' : '' ?>>Reguler</option>
+                                <option value="bumn" <?= $proposal->jenis_magang == 'bumn' ? 'selected' : '' ?>>BUMN</option>
+                                <option value="mbkm" <?= $proposal->jenis_magang == 'mbkm' ? 'selected' : '' ?>>MBKM</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tanggal Pengajuan</label>
+                            <input type="date" name="tanggal_pengajuan" class="form-control" required
+                                value="<?= date('Y-m-d') ?>">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Alamat Instansi</label>
+                        <textarea name="alamat_instansi" class="form-control" rows="2"><?= htmlspecialchars($proposal->alamat_instansi ?? '') ?></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Link Proposal (Google Drive)</label>
+                        <input type="url" name="link_proposal" class="form-control" required
+                            value="<?= htmlspecialchars($proposal->link_proposal) ?>"
+                            placeholder="https://drive.google.com/...">
+                        <small class="text-muted">Upload proposal yang sudah diperbaiki ke Google Drive lalu paste linknya di sini</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-1"></i>Ajukan Ulang
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    <?php elseif ($proposal->status_kaprodi == 'disetujui'): ?>
+        <!-- DISETUJUI KAPRODI - Show Surat & Balasan Section -->
+        <div class="alert alert-success mt-3">
+            <i class="bi bi-check-circle me-2"></i>
+            Selamat! Proposal Anda telah disetujui. Silakan download surat pengantar dan upload balasan mitra.
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-check-circle me-2"></i>Surat Pengantar & Balasan Mitra
+            </div>
+            <div class="card-body">
+                <!-- 1. SURAT PENGANTAR -->
+                <h6 class="mb-3"><i class="bi bi-file-earmark me-1"></i>Surat Pengantar</h6>
+                <?php if (isset($surat) && $surat): ?>
+                    <div class="alert alert-info mb-3">
+                        <strong><?= $surat->nomor_surat ?></strong><br>
+                        Tanggal: <?= date('d M Y', strtotime($surat->tanggal_surat)) ?><br>
+                        <a href="<?= $surat->file_surat ?>" target="_blank" class="btn btn-sm btn-primary mt-2">
+                            <i class="bi bi-download me-1"></i>Download Surat
+                        </a>
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-warning mb-3">
+                        <i class="bi bi-hourglass-split me-2"></i>Surat pengantar sedang disiapkan oleh Sekretaris
+                    </div>
+                <?php endif; ?>
+
+                <!-- 2. BALASAN MITRA -->
+                <hr class="my-3">
+                <h6 class="mb-3"><i class="bi bi-inbox me-1"></i>Balasan Mitra</h6>
+
+                <?php if ($proposal->status_mitra == 'diterima'): ?>
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Selamat! Mitra telah menerima aplikasi magang Anda. DPL sedang dalam proses penugasan.
+                    </div>
+                <?php elseif ($proposal->status_mitra == 'ditolak'): ?>
+                    <div class="alert alert-danger">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Mohon maaf, mitra belum dapat menerima aplikasi Anda. Silakan ajukan ke mitra lain.
+                    </div>
+                <?php endif; ?>
+
+                <!-- Form Upload Balasan (hanya jika surat sudah ada) -->
+                <?php if ((isset($surat) && $surat) && $proposal->status_mitra == 'menunggu'): ?>
+                    <form method="post" action="<?= base_url('proposal/upload_balasan/' . $proposal->proposal_id) ?>">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status Balasan Mitra <span class="text-danger">*</span></label>
+                                <select id="statusMitra" name="status_mitra" class="form-select" required>
+                                    <option value="">-- Pilih Status --</option>
+                                    <option value="diterima">Diterima</option>
+                                    <option value="ditolak">Ditolak</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Link Surat Balasan (Google Drive)
+                                    <span class="text-danger" id="requiredBadge" style="display: none;">*</span>
+                                </label>
+                                <input type="url" id="linkSuratBalasan" name="link_surat_penerimaan" class="form-control"
+                                    placeholder="https://drive.google.com/...">
+                                <small class="text-muted">Upload balasan mitra ke Google Drive (Required jika Diterima)</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-1"></i>Upload Balasan
+                        </button>
+                    </form>
+
+                    <script>
+                        // Conditional required: link only required if status = diterima
+                        const statusSelect = document.getElementById('statusMitra');
+                        const linkInput = document.getElementById('linkSuratBalasan');
+                        const requiredBadge = document.getElementById('requiredBadge');
+
+                        function updateLinkRequired() {
+                            if (statusSelect.value === 'diterima') {
+                                linkInput.required = true;
+                                requiredBadge.style.display = 'inline';
+                            } else {
+                                linkInput.required = false;
+                                requiredBadge.style.display = 'none';
+                            }
+                        }
+
+                        statusSelect.addEventListener('change', updateLinkRequired);
+                        // Initialize on page load
+                        updateLinkRequired();
+                    </script>
+                <?php elseif ((isset($surat) && $surat) && $proposal->status_mitra != 'menunggu'): ?>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Balasan mitra sudah ter-upload dengan status: <strong><?= ucfirst($proposal->status_mitra) ?></strong>
+                    </div>
+                <?php endif; ?>
+
+                <!-- 3. PENUGASAN DPL -->
+                <hr class="my-3">
+                <h6 class="mb-3"><i class="bi bi-person-badge me-1"></i>Penugasan DPL</h6>
+                <?php if (isset($mahasiswa) && $mahasiswa->dosen_dpl_id): ?>
+                    <div class="alert alert-success">
+                        <strong><?= $mahasiswa->nama_dosen ?? 'DPL' ?></strong> sudah ditugaskan<br>
+                        <small>Hubungi DPL untuk memulai bimbingan magang</small>
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle me-2"></i>
+                        DPL akan ditugaskan setelah balasan mitra diterima
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     <?php else: ?>
         <div class="alert alert-info mt-3">
