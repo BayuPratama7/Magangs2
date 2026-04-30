@@ -134,6 +134,24 @@
                         <span class="badge <?= $status_class ?>"><?= ucfirst($proposal->status_kaprodi) ?></span>
                     </td>
                 </tr>
+                <tr>
+                    <th>DPL (Dosen Pembimbing Lapangan)</th>
+                    <td>
+                        <?php if (isset($mahasiswa) && $mahasiswa->dosen_dpl_id): ?>
+                            <strong><?= $mahasiswa->nama_dosen ?? 'DPL' ?></strong>
+                            <?php if (!empty($mahasiswa->kontak_dosen)): ?>
+                                <br><small class="text-muted">Kontak: <?= htmlspecialchars($mahasiswa->kontak_dosen) ?></small>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <span class="badge bg-warning">Belum Ditugaskan</span>
+                            <?php if ($proposal->status_kaprodi == 'disetujui' && $proposal->status_mitra == 'diterima'): ?>
+                                <br><small class="text-muted">DPL akan ditugaskan segera</small>
+                            <?php elseif ($proposal->status_kaprodi == 'disetujui'): ?>
+                                <br><small class="text-muted">DPL akan ditugaskan setelah balasan mitra diterima</small>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
@@ -319,9 +337,10 @@
                 <h6 class="mb-3"><i class="bi bi-inbox me-1"></i>Balasan Mitra</h6>
 
                 <?php if ($proposal->status_mitra == 'diterima'): ?>
-                    <div class="alert alert-success">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <i class="bi bi-check-circle me-2"></i>
                         Selamat! Mitra telah menerima aplikasi magang Anda. DPL sedang dalam proses penugasan.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 <?php elseif ($proposal->status_mitra == 'ditolak'): ?>
                     <div class="alert alert-warning mt-2">
@@ -437,21 +456,6 @@
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle me-2"></i>
                         Balasan mitra sudah ter-upload dengan status: <strong><?= ucfirst($proposal->status_mitra) ?></strong>
-                    </div>
-                <?php endif; ?>
-
-                <!-- 3. PENUGASAN DPL -->
-                <hr class="my-3">
-                <h6 class="mb-3"><i class="bi bi-person-badge me-1"></i>Penugasan DPL</h6>
-                <?php if (isset($mahasiswa) && $mahasiswa->dosen_dpl_id): ?>
-                    <div class="alert alert-success">
-                        <strong><?= $mahasiswa->nama_dosen ?? 'DPL' ?></strong> sudah ditugaskan<br>
-                        <small>Hubungi DPL untuk memulai bimbingan magang</small>
-                    </div>
-                <?php else: ?>
-                    <div class="alert alert-warning">
-                        <i class="bi bi-info-circle me-2"></i>
-                        DPL akan ditugaskan setelah balasan mitra diterima
                     </div>
                 <?php endif; ?>
             </div>
