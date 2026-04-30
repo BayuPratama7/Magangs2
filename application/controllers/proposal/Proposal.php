@@ -66,7 +66,10 @@ class Proposal extends CI_Controller
             'tanggal_pengajuan' => $this->input->post('tanggal_pengajuan'),
             'link_proposal' => $this->input->post('link_proposal'),
             'status_koordinator' => 'menunggu',
-            'status_kaprodi' => 'menunggu'
+            'status_kaprodi' => 'menunggu',
+            'status_mitra' => 'menunggu',
+            'link_surat_penerimaan' => null,
+            'tanggal_balasan_mitra' => null
         ];
 
         $existing = $this->Proposal_model
@@ -80,9 +83,13 @@ class Proposal extends CI_Controller
                 return;
             }
 
-            // Replace old proposal with new one
+            // Delete surat pengantar yang lama
+            $this->db->where('proposal_id', $existing->proposal_id)
+                ->delete('surat_pengantar');
+
+            // Replace old proposal with new one (reset all approvals)
             if ($this->Proposal_model->update($existing->proposal_id, $data)) {
-                $this->session->set_flashdata('success', 'Proposal baru berhasil diajukan');
+                $this->session->set_flashdata('success', 'Proposal baru berhasil diajukan. Data sudah direset untuk review ulang.');
             } else {
                 $this->session->set_flashdata('error', 'Proposal gagal diajukan');
             }
