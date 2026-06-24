@@ -94,6 +94,7 @@ CREATE TABLE proposal_magang (
     instansi_tujuan VARCHAR(200) NOT NULL,
     alamat_instansi TEXT,
     jenis_magang VARCHAR(20) NOT NULL CHECK (jenis_magang IN ('reguler', 'bumn', 'mbkm')),
+    provinsi VARCHAR(100),
     tanggal_mulai DATE,
     tanggal_selesai DATE,
     tanggal_pengajuan DATE DEFAULT CURRENT_DATE,
@@ -105,6 +106,9 @@ CREATE TABLE proposal_magang (
     status_kaprodi VARCHAR(20) DEFAULT 'menunggu' CHECK (status_kaprodi IN ('menunggu', 'disetujui', 'ditolak')),
     catatan_kaprodi TEXT,
     tanggal_acc_kaprodi TIMESTAMP,
+    status_mitra VARCHAR(20) DEFAULT 'menunggu' CHECK (status_mitra IN ('menunggu', 'diterima', 'ditolak')),
+    tanggal_balasan_mitra TIMESTAMP,
+    butuh_surat_pengantar SMALLINT DEFAULT 1 CHECK (butuh_surat_pengantar IN (0, 1)),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
