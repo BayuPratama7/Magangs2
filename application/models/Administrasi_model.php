@@ -18,6 +18,11 @@ class Administrasi_model extends CI_Model
         return $this->db->get_where('surat_pengantar', ['mahasiswa_id' => $mahasiswa_id])->row();
     }
 
+    public function get_surat_by_proposal($proposal_id)
+    {
+        return $this->db->get_where('surat_pengantar', ['proposal_id' => $proposal_id])->row();
+    }
+
     public function get_all_surat()
     {
         return $this->db
@@ -163,11 +168,12 @@ class Administrasi_model extends CI_Model
     public function get_mahasiswa_tanpa_dpl()
     {
         return $this->db
-            ->select('m.*, p.judul_proposal, p.instansi_tujuan, p.status_kaprodi')
+            ->select('DISTINCT m.mahasiswa_id, m.user_id, m.nim, m.nama_mahasiswa, m.prodi, m.angkatan, m.kelas, m.no_hp, m.alamat, m.dosen_dpl_id, m.status_magang, m.created_at, m.updated_at, p.proposal_id, p.judul_proposal, p.instansi_tujuan, p.status_kaprodi, p.status_mitra, p.tanggal_balasan_mitra')
             ->from('mahasiswa m')
             ->join('proposal_magang p', 'p.mahasiswa_id = m.mahasiswa_id')
             ->where('m.dosen_dpl_id IS NULL')
             ->where('p.status_kaprodi', 'disetujui')
+            ->where('p.status_mitra', 'diterima')
             ->get()
             ->result();
     }
