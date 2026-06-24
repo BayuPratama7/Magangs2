@@ -168,7 +168,7 @@ class Administrasi_model extends CI_Model
     public function get_mahasiswa_tanpa_dpl()
     {
         return $this->db
-            ->select('m.*, p.judul_proposal, p.instansi_tujuan, p.proposal_id, p.status_kaprodi, p.status_mitra, p.tanggal_balasan_mitra')
+            ->select('m.*, p.judul_proposal, p.instansi_tujuan, p.proposal_id, p.status_kaprodi, p.status_mitra, p.tanggal_balasan_mitra, p.butuh_surat_pengantar')
             ->from('mahasiswa m')
             ->join('proposal_magang p', 'p.mahasiswa_id = m.mahasiswa_id')
             ->where('m.dosen_dpl_id IS NULL')
