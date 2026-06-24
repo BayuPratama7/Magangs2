@@ -195,11 +195,22 @@ class Admin extends CI_Controller
         $assigned = $this->Administrasi_model->get_mahasiswa_dengan_dpl();
         $dosen_list = $this->Dosen_model->get_all_dpl();
 
+        // Get mahasiswa dengan balasan mitra yang sudah di-upload
+        $balasan_list = $this->db
+            ->select('m.*, p.instansi_tujuan, p.link_surat_penerimaan, p.status_mitra, p.tanggal_balasan_mitra')
+            ->from('mahasiswa m')
+            ->join('proposal_magang p', 'p.mahasiswa_id = m.mahasiswa_id', 'left')
+            ->where('p.link_surat_penerimaan IS NOT NULL')
+            ->order_by('p.tanggal_balasan_mitra', 'DESC')
+            ->get()
+            ->result();
+
         $data = [
             'page_title' => 'Penugasan DPL',
             'pending' => $pending,
             'assigned' => $assigned,
-            'dosen_list' => $dosen_list
+            'dosen_list' => $dosen_list,
+            'balasan_list' => $balasan_list
         ];
 
         $data['content'] = $this->load->view('admin/dpl', $data, TRUE);
@@ -228,12 +239,13 @@ class Admin extends CI_Controller
 
     public function surat()
     {
-        // Get mahasiswa yang belum ada surat
+        // Get mahasiswa yang belum ada surat dan BUTUH surat pengantar
         $this->db->select('m.*, p.proposal_id, p.instansi_tujuan, p.alamat_instansi')
             ->from('mahasiswa m')
             ->join('proposal_magang p', 'p.mahasiswa_id = m.mahasiswa_id')
             ->join('surat_pengantar s', 's.mahasiswa_id = m.mahasiswa_id', 'left')
             ->where('p.status_kaprodi', 'disetujui')
+            ->where('p.butuh_surat_pengantar', 1)
             ->where('s.surat_id IS NULL');
         $pending = $this->db->get()->result();
 
@@ -432,11 +444,13 @@ class Admin extends CI_Controller
     {
         $sebaran_list = $this->Dashboard_model->get_all_sebaran();
         $periode_list = $this->Dashboard_model->get_available_periode();
+        $provinsi_list = $this->db->get('provinsi')->result();
 
         $data = [
             'page_title' => 'Kelola Sebaran Magang',
             'sebaran_list' => $sebaran_list,
-            'periode_list' => $periode_list
+            'periode_list' => $periode_list,
+            'provinsi_list' => $provinsi_list
         ];
 
         $data['content'] = $this->load->view('admin/sebaran', $data, TRUE);

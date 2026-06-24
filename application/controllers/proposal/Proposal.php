@@ -36,9 +36,13 @@ class Proposal extends CI_Controller
         // Get DPL info
         $mahasiswa_with_dpl = $this->Mahasiswa_model->get_with_dpl($mahasiswa->mahasiswa_id);
 
+        // Load provinsi data
+        $provinsi_list = $this->db->get('provinsi')->result();
+
         $data['mahasiswa'] = $mahasiswa_with_dpl;
         $data['proposal'] = $proposal;
         $data['surat'] = $surat;
+        $data['provinsi_list'] = $provinsi_list;
         $data['page_title'] = 'Proposal Magang';
         $data['content'] = $this->load->view('proposal/index', $data, TRUE);
         $this->load->view('layouts/main', $data);

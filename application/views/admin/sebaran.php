@@ -97,7 +97,14 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Provinsi</label>
-                            <input type="text" name="provinsi" class="form-control" required>
+                            <select name="provinsi" class="form-select" required>
+                                <option value="">-- Pilih Provinsi --</option>
+                                <?php if (isset($provinsi_list) && !empty($provinsi_list)): ?>
+                                    <?php foreach ($provinsi_list as $p): ?>
+                                        <option value="<?= $p->nama_provinsi ?>"><?= $p->nama_provinsi ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
                         </div>
                     </div>
                     <div class="row">
