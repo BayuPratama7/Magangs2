@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'postgres',
-	'password' => '1',
-	'database' => 'db_magang2',
+	'hostname' => getenv('PGHOST') ?: 'localhost',
+	'username' => getenv('PGUSER') ?: 'postgres',
+	'password' => getenv('PGPASSWORD') ?: '1',
+	'database' => getenv('PGDATABASE') ?: 'db_magang2',
 	'dbdriver' => 'postgre',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
