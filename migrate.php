@@ -1,15 +1,23 @@
 <?php
 $db_url = getenv('DATABASE_URL');
-if (!$db_url) {
-    die("Error: DATABASE_URL not found. Pastikan Anda sudah menghubungkan Postgres di Railway Variables.");
+$host = getenv('PGHOST');
+$user = getenv('PGUSER');
+$pass = getenv('PGPASSWORD');
+$db   = getenv('PGDATABASE');
+$port = getenv('PGPORT') ? getenv('PGPORT') : 5432;
+
+if ($db_url) {
+    $parsed = parse_url($db_url);
+    $host = isset($parsed['host']) ? $parsed['host'] : $host;
+    $user = isset($parsed['user']) ? $parsed['user'] : $user;
+    $pass = isset($parsed['pass']) ? $parsed['pass'] : $pass;
+    $db   = isset($parsed['path']) ? ltrim($parsed['path'], '/') : $db;
+    $port = isset($parsed['port']) ? $parsed['port'] : $port;
 }
 
-$parsed = parse_url($db_url);
-$host = $parsed['host'];
-$user = $parsed['user'];
-$pass = $parsed['pass'];
-$db   = ltrim($parsed['path'], '/');
-$port = isset($parsed['port']) ? $parsed['port'] : 5432;
+if (!$host || !$db) {
+    die("Error: Kredensial database tidak ditemukan di Railway Variables.");
+}
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$db";
 
