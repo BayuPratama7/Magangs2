@@ -73,12 +73,34 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
+$db_host = 'localhost';
+$db_user = 'postgres';
+$db_pass = '1';
+$db_name = 'db_magang2';
+$db_port = 5432;
+
+if ($db_url = getenv('DATABASE_URL')) {
+    $parsed = parse_url($db_url);
+    $db_host = isset($parsed['host']) ? $parsed['host'] : $db_host;
+    $db_user = isset($parsed['user']) ? $parsed['user'] : $db_user;
+    $db_pass = isset($parsed['pass']) ? $parsed['pass'] : $db_pass;
+    $db_name = isset($parsed['path']) ? ltrim($parsed['path'], '/') : $db_name;
+    $db_port = isset($parsed['port']) ? $parsed['port'] : $db_port;
+} elseif (getenv('PGHOST')) {
+    $db_host = getenv('PGHOST');
+    $db_user = getenv('PGUSER');
+    $db_pass = getenv('PGPASSWORD');
+    $db_name = getenv('PGDATABASE');
+    $db_port = getenv('PGPORT') ? getenv('PGPORT') : 5432;
+}
+
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => getenv('PGHOST') ?: 'localhost',
-	'username' => getenv('PGUSER') ?: 'postgres',
-	'password' => getenv('PGPASSWORD') ?: '1',
-	'database' => getenv('PGDATABASE') ?: 'db_magang2',
+	'hostname' => $db_host,
+	'username' => $db_user,
+	'password' => $db_pass,
+	'database' => $db_name,
+	'port'     => $db_port,
 	'dbdriver' => 'postgre',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
