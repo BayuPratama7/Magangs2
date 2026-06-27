@@ -47,9 +47,30 @@ class Koordinator extends CI_Controller
     // Detail proposal
     public function detail($id)
     {
-        $data['proposal'] = $this->Proposal_model->get_by_id($id);
-        $data['page_title'] = 'Detail Proposal';
-        $data['content'] = $this->load->view('proposal/detail', $data, TRUE);
+        $proposal = $this->Proposal_model->get_by_id($id);
+        if (!$proposal) {
+            $this->session->set_flashdata('error', 'Proposal tidak ditemukan');
+            redirect('koordinator');
+        }
+
+        // Get Mahasiswa & DPL info
+        $dpl = null;
+        $mahasiswa = null;
+        if ($proposal->mahasiswa_id) {
+            $mahasiswa = $this->db->get_where('mahasiswa', ['mahasiswa_id' => $proposal->mahasiswa_id])->row();
+            if ($mahasiswa && $mahasiswa->dosen_dpl_id) {
+                $dpl = $this->db->get_where('dosen', ['dosen_id' => $mahasiswa->dosen_dpl_id])->row();
+            }
+        }
+
+        $data = [
+            'page_title' => 'Detail Proposal',
+            'proposal' => $proposal,
+            'mahasiswa' => $mahasiswa,
+            'dpl' => $dpl
+        ];
+
+        $data['content'] = $this->load->view('admin/detail_proposal', $data, TRUE);
         $this->load->view('layouts/main', $data);
     }
 

@@ -9,7 +9,7 @@ class PengujiController extends CI_Controller
         parent::__construct();
         check_login();
         check_role([6]); // role penguji
-        $this->load->model(['Dosen_model', 'Desiminasi_model', 'Administrasi_model']);
+        $this->load->model(['Dosen_model', 'Desiminasi_model', 'Administrasi_model', 'Jadwal_model']);
     }
 
     // Konfirmasi kesediaan menguji
@@ -28,10 +28,39 @@ class PengujiController extends CI_Controller
         $data['content'] = $this->load->view('penguji/konfirmasi', $data, TRUE);
         $this->load->view('layouts/main', $data);
     }
+    public function detail($desiminasi_id)
+    {
+        $user_id = $this->session->userdata('user_id');
+        $dosen = $this->Dosen_model->get_by_user($user_id);
+
+        $desiminasi = $this->Desiminasi_model->get_detail($desiminasi_id);
+        
+        if (!$desiminasi || $desiminasi->penguji_id != $dosen->dosen_id) {
+            $this->session->set_flashdata('error', 'Data desiminasi tidak ditemukan atau Anda tidak berhak mengaksesnya');
+            redirect('penguji/konfirmasi');
+        }
+
+        $jadwal = $this->Jadwal_model->get_by_desiminasi($desiminasi_id);
+
+        $data = [
+            'page_title' => 'Detail Mahasiswa',
+            'desiminasi' => $desiminasi,
+            'jadwal' => $jadwal
+        ];
+
+        $data['content'] = $this->load->view('penguji/detail', $data, TRUE);
+        $this->load->view('layouts/main', $data);
+    }
 
     public function konfirmasi_terima($desiminasi_id)
+
     {
         if ($this->Desiminasi_model->konfirmasi_penguji($desiminasi_id, 'bersedia')) {
+            // Update jadwal status dari 'menunggu_konfirmasi' ke 'terkonfirmasi'
+            $jadwal = $this->Jadwal_model->get_by_desiminasi($desiminasi_id);
+            if ($jadwal) {
+                $this->Jadwal_model->update_status($jadwal->jadwal_id, 'terkonfirmasi');
+            }
             $this->session->set_flashdata('success', 'Berhasil menyatakan bersedia menguji');
         } else {
             $this->session->set_flashdata('error', 'Gagal memproses konfirmasi');
@@ -40,14 +69,32 @@ class PengujiController extends CI_Controller
         redirect('penguji/konfirmasi');
     }
 
-    public function konfirmasi_tolak($desiminasi_id)
+    public function proses_ubah_jadwal($desiminasi_id)
     {
-        if ($this->Desiminasi_model->konfirmasi_penguji($desiminasi_id, 'tidak_bersedia')) {
-            // Reset penguji assignment
-            $this->Desiminasi_model->update($desiminasi_id, ['penguji_id' => null]);
-            $this->session->set_flashdata('info', 'Penugasan dikembalikan ke sekretaris');
+        $tanggal_desiminasi = $this->input->post('tanggal_desiminasi');
+        $waktu_mulai = $this->input->post('waktu_mulai');
+        $waktu_selesai = $this->input->post('waktu_selesai');
+        $ruangan = $this->input->post('ruangan');
+        $link_online = $this->input->post('link_online');
+
+        // Update jadwal dengan data baru dan ubah status ke 'terkonfirmasi'
+        $jadwal = $this->Jadwal_model->get_by_desiminasi($desiminasi_id);
+        if ($jadwal) {
+            $this->Jadwal_model->update($jadwal->jadwal_id, [
+                'tanggal_desiminasi' => $tanggal_desiminasi,
+                'waktu_mulai' => $waktu_mulai,
+                'waktu_selesai' => $waktu_selesai,
+                'ruangan' => $ruangan,
+                'link_online' => $link_online,
+                'status' => 'terkonfirmasi'
+            ]);
+        }
+
+        // Set konfirmasi penguji ke 'bersedia' karena mereka sendiri yang merubah jadwal
+        if ($this->Desiminasi_model->konfirmasi_penguji($desiminasi_id, 'bersedia')) {
+            $this->session->set_flashdata('success', 'Jadwal desiminasi berhasil diubah dan disetujui');
         } else {
-            $this->session->set_flashdata('error', 'Gagal memproses konfirmasi');
+            $this->session->set_flashdata('error', 'Gagal memproses perubahan jadwal');
         }
 
         redirect('penguji/konfirmasi');
@@ -59,12 +106,13 @@ class PengujiController extends CI_Controller
         $user_id = $this->session->userdata('user_id');
         $dosen = $this->Dosen_model->get_by_user($user_id);
 
-        $this->db->select('j.*, m.nim, m.nama_mahasiswa, p.judul_proposal')
+        $this->db->select('j.*, m.nim, m.nama_mahasiswa, p.judul_proposal, d.desiminasi_id')
             ->from('jadwal_desiminasi j')
             ->join('desiminasi d', 'd.desiminasi_id = j.desiminasi_id')
             ->join('mahasiswa m', 'm.mahasiswa_id = j.mahasiswa_id')
             ->join('proposal_magang p', 'p.mahasiswa_id = m.mahasiswa_id', 'left')
             ->where('d.penguji_id', $dosen->dosen_id)
+            ->where_in('j.status', ['terjadwal', 'terkonfirmasi', 'selesai'])
             ->order_by('j.tanggal_desiminasi', 'ASC');
         $jadwal = $this->db->get()->result();
 
@@ -117,6 +165,14 @@ class PengujiController extends CI_Controller
         ];
 
         if ($this->Administrasi_model->update_hasil($hasil_id, $data)) {
+            // Update jadwal status ke 'selesai'
+            $hasil = $this->db->get_where('hasil_desiminasi', ['hasil_id' => $hasil_id])->row();
+            if ($hasil) {
+                $jadwal = $this->Jadwal_model->get_by_desiminasi($hasil->desiminasi_id);
+                if ($jadwal) {
+                    $this->Jadwal_model->update_status($jadwal->jadwal_id, 'selesai');
+                }
+            }
             $this->session->set_flashdata('success', 'Hasil desiminasi berhasil disimpan');
         } else {
             $this->session->set_flashdata('error', 'Gagal menyimpan hasil');

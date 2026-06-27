@@ -54,21 +54,93 @@
         }
 
         .sidebar-brand {
-            padding: 1.2rem 1.5rem;
-            background: var(--primary-gradient);
-            text-align: center;
+            padding: 0.8rem 1rem 0.8rem 3.2rem;
+            background: #D5E5FF;
             flex-shrink: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.8rem;
+            height: auto;
+            min-height: 70px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        .sidebar-brand-icon {
+            color: #0073AC;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            overflow: visible;
+        }
+
+        .sidebar-brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .sidebar-brand-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 0.05rem;
+            flex: 0;
+            overflow: visible;
         }
 
         .sidebar-brand h4 {
             margin: 0;
+            padding: 0;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            color: #0073AC;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: visible;
         }
 
         .sidebar-brand small {
-            opacity: 0.8;
-            font-size: 0.75rem;
+            margin: 0;
+            padding: 0;
+            font-size: 0.7rem;
+            color: #0073AC;
+            font-family: 'Arial', sans-serif;
+            font-weight: 400;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: visible;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 50%;
+            left: 0.5rem;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #0073AC;
+            width: 40px;
+            height: 40px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.8rem;
+            transition: transform 0.2s ease;
+            padding: 0;
+        }
+
+        .sidebar-close:hover {
+            transform: translateY(-50%) scale(1.1);
         }
 
         .sidebar-menu {
@@ -147,6 +219,12 @@
             position: sticky;
             top: 0;
             z-index: 999;
+        }
+
+        #toggleSidebar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .user-info {
@@ -338,14 +416,146 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Alert */
+        /* Alert Notifications */
         .alert {
             border: none;
             border-radius: 10px;
             font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            padding: 0.9rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            max-width: 100%;
+            text-align: left;
         }
 
-        /* Responsive */
+        .alert-success {
+            background: #D4EDDA;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-success .bi {
+            color: #28a745;
+            font-size: 1.2rem;
+        }
+
+        .alert-danger {
+            background: #F8D7DA;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-danger .bi {
+            color: #dc3545;
+            font-size: 1.2rem;
+        }
+
+        .alert-info {
+            background: #D1ECF1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-info .bi {
+            color: #17a2b8;
+            font-size: 1.2rem;
+        }
+
+        .alert-warning {
+            background: #FFF3CD;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-warning .bi {
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+
+        .alert i {
+            margin-right: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .alert-dismissible {
+            padding-right: 1rem;
+        }
+
+        .alert .btn-close {
+            opacity: 0.5;
+            flex-shrink: 0;
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        .alert .btn-close:hover {
+            opacity: 0.75;
+        }
+
+        /* ====================================
+         * GLOBAL MODAL STYLING
+         * Semua modal header menggunakan warna biru sidebar
+         * ==================================== */
+        .modal-header {
+            background: var(--primary-gradient) !important;
+            color: white !important;
+            border-bottom: none;
+        }
+
+        .modal-header .modal-title {
+            color: white !important;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+
+        .modal-header .btn-close:hover {
+            opacity: 1;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* Override tombol aksi utama di modal agar konsisten biru */
+        .modal-footer .btn-success,
+        .modal-footer .btn-primary {
+            background: var(--primary-gradient) !important;
+            border: none !important;
+        }
+
+        .modal-footer .btn-success:hover,
+        .modal-footer .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Icon di dalam modal body mengikuti tema */
+        .modal-body .text-success.display-4,
+        .modal-body .text-success.display-1 {
+            color: #667eea !important;
+        }
+
+        /* Responsive - Sidebar toggle */
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -358,16 +568,96 @@
             .main-content {
                 margin-left: 0;
             }
+
+            .sidebar-close {
+                display: flex;
+            }
+
+        }
+
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f1f5f9;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        .metaball-container {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            filter: url('#gooey');
+        }
+
+        .blob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .blob-1 {
+            animation: metaball-move 1.2s infinite alternate ease-in-out;
+        }
+
+        .blob-2 {
+            animation: metaball-move 1.2s infinite alternate-reverse ease-in-out;
+            background: #764ba2;
+        }
+
+        @keyframes metaball-move {
+            0% { transform: translate(-50%, -50%) translateX(-25px); }
+            100% { transform: translate(-50%, -50%) translateX(25px); }
         }
     </style>
 </head>
 
 <body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="metaball-container">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+        </div>
+        <!-- SVG Filter for Metaball -->
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none;">
+            <defs>
+                <filter id="gooey">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </defs>
+        </svg>
+    </div>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <h4><i class="bi bi-mortarboard-fill"></i> SISTEM MAGANG</h4>
-            <small>Prodi Sistem Informasi</small>
+            <button class="sidebar-close" id="closeSidebar" aria-label="Tutup menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="sidebar-brand-icon">
+                <img src="<?= base_url('public/images/logo/sipmagang.png') ?>" alt="SIPMAGANG Logo" style="width: 40px; height: 40px; object-fit: contain;">
+            </div>
+            <div class="sidebar-brand-text">
+                <h4>SIPMAGANG</h4>
+                <small>Prodi Sistem Informasi</small>
+            </div>
         </div>
 
         <nav class="sidebar-menu">
@@ -510,10 +800,6 @@
                     class="<?= strpos($current_url, 'admin/surat') !== false ? 'active' : '' ?>">
                     <i class="bi bi-envelope"></i> Surat Pengantar
                 </a>
-                <a href="<?= base_url('admin/penguji') ?>"
-                    class="<?= strpos($current_url, 'admin/penguji') !== false ? 'active' : '' ?>">
-                    <i class="bi bi-person-check"></i> Penugasan Penguji
-                </a>
                 <a href="<?= base_url('admin/jadwal') ?>"
                     class="<?= strpos($current_url, 'admin/jadwal') !== false ? 'active' : '' ?>">
                     <i class="bi bi-calendar-event"></i> Jadwal Desiminasi
@@ -612,11 +898,11 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
         <!-- Top Navbar -->
         <div class="top-navbar">
             <div>
-                <button class="btn btn-sm btn-light d-lg-none" id="toggleSidebar">
+                <button class="btn btn-sm btn-light" id="toggleSidebar">
                     <i class="bi bi-list"></i>
                 </button>
                 <span class="ms-2 fw-semibold"><?= isset($page_title) ? $page_title : 'Dashboard' ?></span>
@@ -660,9 +946,75 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Toggle sidebar on mobile
-        document.getElementById('toggleSidebar')?.addEventListener('click', function () {
-            document.querySelector('.sidebar').classList.toggle('show');
+        (function() {
+            var sidebar = document.getElementById('sidebar');
+            var mainContent = document.getElementById('mainContent');
+            var toggleBtn = document.getElementById('toggleSidebar');
+            var closeBtn = document.getElementById('closeSidebar');
+
+            function isMobileView() {
+                return window.innerWidth <= 992;
+            }
+
+            function closeSidebarMobile() {
+                sidebar.classList.remove('show');
+            }
+
+            // Tombol X di sidebar untuk tutup
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeSidebarMobile);
+            }
+
+            // Toggle sidebar
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    if (isMobileView()) {
+                        sidebar.classList.toggle('show');
+                        return;
+                    }
+
+                    sidebar.classList.toggle('hidden');
+                    mainContent.classList.toggle('expanded');
+                });
+            }
+
+            function syncSidebarState() {
+                if (isMobileView()) {
+                    sidebar.classList.remove('hidden');
+                    mainContent.classList.remove('expanded');
+                    return;
+                }
+
+                sidebar.classList.remove('show');
+            }
+
+            window.addEventListener('resize', syncSidebarState);
+            syncSidebarState();
+
+            // Auto-dismiss alerts setelah 5 detik
+            document.addEventListener('DOMContentLoaded', function() {
+                const alerts = document.querySelectorAll('.alert.alert-success, .alert.alert-danger');
+                alerts.forEach(function(alert) {
+                    setTimeout(function() {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }, 5000); // 5 detik
+                });
+            });
+        })();
+
+        // Preloader Logic
+        window.addEventListener('load', function () {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => {
+                        preloader.style.visibility = 'hidden';
+                        preloader.style.display = 'none';
+                    }, 400); // Tunggu efek fade out selesai
+                }, 400); // Tahan preloader selama 0.8 detik
+            }
         });
     </script>
 </body>

@@ -9,7 +9,7 @@ class Penguji extends CI_Controller
         parent::__construct();
         check_login();
         check_role([6]); // role penguji
-        $this->load->model(['Dosen_model', 'Desiminasi_model', 'Administrasi_model']);
+        $this->load->model(['Dosen_model', 'Desiminasi_model', 'Administrasi_model', 'Dashboard_model']);
     }
 
     public function index()
@@ -65,10 +65,31 @@ class Penguji extends CI_Controller
             'pending_konfirmasi' => $pending_konfirmasi,
             'jadwal_menguji' => $jadwal_menguji,
             'pending_laporan_akhir' => $pending_laporan_akhir,
-            'stats' => $stats
+            'stats' => $stats,
+            'sebaran_jenis' => $this->Dashboard_model->get_sebaran_by_jenis(),
+            'tahun_akademik_list' => $this->Dashboard_model->get_tahun_akademik_list(),
+            'provinsi_list' => $this->Dashboard_model->get_provinsi_list(),
+            'sebaran_provinsi' => $this->Dashboard_model->get_sebaran_by_provinsi()
         ];
 
         $data['content'] = $this->load->view('dashboard/penguji_content', $data, TRUE);
         $this->load->view('layouts/main', $data);
+    }
+
+    public function sebaran_filter()
+    {
+        if (!$this->input->is_ajax_request()) show_404();
+        $mode = $this->input->get('mode') ?? 'jenis';
+        if ($mode === 'provinsi') {
+            $data = $this->Dashboard_model->get_sebaran_by_provinsi();
+            $result = array_map(function($d) { return ['label' => $d->provinsi, 'total' => (int) $d->total]; }, $data);
+        } else {
+            $provinsi = $this->input->get('provinsi');
+            $tahun = $this->input->get('tahun');
+            $jenis = $this->input->get('jenis');
+            $data = $this->Dashboard_model->get_sebaran_by_jenis_provinsi($provinsi, $tahun, $jenis);
+            $result = array_map(function($d) { return ['label' => strtoupper($d->jenis_magang), 'key' => $d->jenis_magang, 'total' => (int) $d->total]; }, $data);
+        }
+        $this->output->set_content_type('application/json')->set_output(json_encode($result));
     }
 }

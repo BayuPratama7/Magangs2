@@ -48,7 +48,7 @@
                                 </td>
                                 <td>
                                     <?php if ($l->link_laporan_akhir && $l->status_laporan_akhir != 'disetujui'): ?>
-                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
                                             data-bs-target="#accModal<?= $l->hasil_id ?>">
                                             <i class="bi bi-check"></i> ACC
                                         </button>
@@ -127,7 +127,7 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="bi bi-x me-1"></i>Batal
                             </button>
-                            <a href="<?= base_url('penguji/laporan_acc/' . $l->hasil_id) ?>" class="btn btn-success">
+                            <a href="<?= base_url('penguji/laporan_acc/' . $l->hasil_id) ?>" class="btn btn-primary">
                                 <i class="bi bi-check-circle me-1"></i>Ya, ACC Laporan
                             </a>
                         </div>

@@ -14,12 +14,13 @@ class Desiminasi_model extends CI_Model
     public function get_detail($id)
     {
         return $this->db
-            ->select('d.*, m.nim, m.nama_mahasiswa, p.judul_proposal, p.instansi_tujuan, 
-                      l.link_laporan, l.jenis_laporan')
+            ->select('d.*, m.nim, m.nama_mahasiswa, m.dosen_dpl_id, p.judul_proposal, p.instansi_tujuan, 
+                      l.link_laporan, l.jenis_laporan, dpl.nama_dosen as nama_dpl')
             ->from('desiminasi d')
             ->join('mahasiswa m', 'm.mahasiswa_id = d.mahasiswa_id')
             ->join('proposal_magang p', 'p.mahasiswa_id = d.mahasiswa_id', 'left')
             ->join('laporan_magang l', 'l.laporan_id = d.laporan_id', 'left')
+            ->join('dosen dpl', 'dpl.dosen_id = m.dosen_dpl_id', 'left')
             ->where('d.desiminasi_id', $id)
             ->get()
             ->row();
@@ -42,12 +43,29 @@ class Desiminasi_model extends CI_Model
     public function get_all_pending()
     {
         return $this->db
-            ->select('d.*, m.nim, m.nama_mahasiswa, p.judul_proposal, p.instansi_tujuan')
+            ->select('d.*, m.nim, m.nama_mahasiswa, m.dosen_dpl_id, p.judul_proposal, p.instansi_tujuan, ds.nama_dosen as nama_dpl')
             ->from('desiminasi d')
             ->join('mahasiswa m', 'm.mahasiswa_id = d.mahasiswa_id')
             ->join('proposal_magang p', 'p.mahasiswa_id = d.mahasiswa_id', 'left')
+            ->join('dosen ds', 'ds.dosen_id = m.dosen_dpl_id', 'left')
             ->where('d.status_pengajuan', 'menunggu')
             ->order_by('d.tanggal_pengajuan', 'ASC')
+            ->get()
+            ->result();
+    }
+
+    public function get_all_pengajuan()
+    {
+        return $this->db
+            ->select('d.*, m.nim, m.nama_mahasiswa, m.dosen_dpl_id, p.judul_proposal, p.instansi_tujuan, ds.nama_dosen as nama_dpl, penguji.nama_dosen as nama_penguji, j.tanggal_desiminasi, j.waktu_mulai, j.waktu_selesai, j.ruangan')
+            ->from('desiminasi d')
+            ->join('mahasiswa m', 'm.mahasiswa_id = d.mahasiswa_id')
+            ->join('proposal_magang p', 'p.mahasiswa_id = d.mahasiswa_id', 'left')
+            ->join('dosen ds', 'ds.dosen_id = m.dosen_dpl_id', 'left')
+            ->join('dosen penguji', 'penguji.dosen_id = d.penguji_id', 'left')
+            ->join('jadwal_desiminasi j', 'j.desiminasi_id = d.desiminasi_id', 'left')
+            ->order_by("CASE d.status_pengajuan WHEN 'menunggu' THEN 1 WHEN 'diterima' THEN 2 WHEN 'ditolak' THEN 3 ELSE 4 END", 'ASC', FALSE)
+            ->order_by('d.tanggal_pengajuan', 'DESC')
             ->get()
             ->result();
     }
@@ -70,10 +88,11 @@ class Desiminasi_model extends CI_Model
     public function get_pending_konfirmasi($dosen_id)
     {
         return $this->db
-            ->select('d.*, m.nim, m.nama_mahasiswa, p.judul_proposal, p.instansi_tujuan')
+            ->select('d.*, m.nim, m.nama_mahasiswa, p.judul_proposal, p.instansi_tujuan, j.tanggal_desiminasi, j.waktu_mulai, j.waktu_selesai, j.ruangan')
             ->from('desiminasi d')
             ->join('mahasiswa m', 'm.mahasiswa_id = d.mahasiswa_id')
             ->join('proposal_magang p', 'p.mahasiswa_id = d.mahasiswa_id', 'left')
+            ->join('jadwal_desiminasi j', 'j.desiminasi_id = d.desiminasi_id', 'left')
             ->where('d.penguji_id', $dosen_id)
             ->where('d.konfirmasi_penguji', 'menunggu')
             ->order_by('d.tanggal_pengajuan', 'ASC')

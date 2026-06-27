@@ -2,8 +2,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <h4 class="mb-1">Selamat Datang, <?= $mahasiswa->nama_mahasiswa ?? 'Mahasiswa' ?></h4>
-        <p class="text-muted mb-0">NIM: <?= $mahasiswa->nim ?? '-' ?> | <?= $mahasiswa->prodi ?? 'Sistem Informasi' ?>
-        </p>
+        <p class="text-muted mb-0">NIM: <?= $mahasiswa->nim ?? '-' ?> | <?= $mahasiswa->prodi ?? 'Sistem Informasi' ?></p>
     </div>
 </div>
 
@@ -31,8 +30,19 @@
         </div>
     </div>
     <div class="col-md-6 col-lg-3">
-        <div class="stat-card orange">
-            <h3><?= $stats->desiminasi_status ?? 'Belum' ?></h3>
+        <?php
+        $desi_status = $stats->desiminasi_status ?? 'Belum';
+        $desi_card_class = 'orange'; // default
+        if (in_array($desi_status, ['Lulus', 'Selesai'])) {
+            $desi_card_class = 'green';
+        } elseif (in_array($desi_status, ['Tidak lulus', 'Perlu Revisi'])) {
+            $desi_card_class = 'red';
+        } elseif (in_array($desi_status, ['Terjadwal', 'Menunggu ACC', 'Lulus bersyarat'])) {
+            $desi_card_class = 'blue';
+        }
+        ?>
+        <div class="stat-card <?= $desi_card_class ?>">
+            <h3><?= $desi_status ?></h3>
             <p>Status Desiminasi</p>
             <i class="bi bi-easel"></i>
         </div>
@@ -43,8 +53,12 @@
     <!-- Alur Magang -->
     <div class="col-lg-8">
         <div class="card">
-            <div class="card-header">
-                <i class="bi bi-diagram-3 me-2"></i>Alur Proses Magang
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-diagram-3 me-2"></i>Alur Proses Magang</span>
+                <!-- Link Drive Panduan Magang (Silakan sesuaikan link URL nya) -->
+                <a href="https://drive.google.com/file/d/1jkedpmmJuEwWl5CL6nDIMs3TUA8Oy__C/view?usp=drive_link" target="_blank" class="btn btn-primary btn-sm shadow-sm" style="border-radius: 6px;">
+                    <i class="bi bi-book me-1"></i>Panduan Magang
+                </a>
             </div>
             <div class="card-body">
                 <div class="row text-center">
@@ -58,11 +72,15 @@
                         </a>
                     </div>
                     <div class="col">
-                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center <?= isset($surat_pengantar) && $surat_pengantar ? 'bg-success' : 'bg-secondary' ?>"
+                        <?php
+                        $butuh_surat_dashboard = isset($proposal) && isset($proposal->butuh_surat_pengantar) ? (int)$proposal->butuh_surat_pengantar : 1;
+                        $surat_step_done = ($butuh_surat_dashboard == 0) || (isset($surat_pengantar) && $surat_pengantar);
+                        ?>
+                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center <?= $surat_step_done ? 'bg-success' : 'bg-secondary' ?>"
                             style="width: 50px; height: 50px;">
                             <i class="bi bi-2-circle-fill text-white fs-5"></i>
                         </div>
-                        <small class="d-block">Surat Pengantar</small>
+                        <small class="d-block"><?= $butuh_surat_dashboard == 0 ? 'Tanpa Surat' : 'Surat Pengantar' ?></small>
                     </div>
                     <div class="col">
                         <a href="<?= base_url('logbook') ?>" class="text-decoration-none">
@@ -92,11 +110,14 @@
                         </a>
                     </div>
                     <div class="col">
-                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center bg-secondary"
+                        <?php
+                        $selesai_done = (isset($hasil_desiminasi) && $hasil_desiminasi && $hasil_desiminasi->status_laporan_akhir == 'disetujui');
+                        ?>
+                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center <?= $selesai_done ? 'bg-success' : 'bg-secondary' ?>"
                             style="width: 50px; height: 50px;">
                             <i class="bi bi-check-circle-fill text-white fs-5"></i>
                         </div>
-                        <small class="d-block">Selesai</small>
+                        <small class="d-block"><?= $selesai_done ? '<strong class="text-success">Selesai ✓</strong>' : 'Selesai' ?></small>
                     </div>
                 </div>
             </div>
@@ -149,7 +170,10 @@
             </div>
 
             <!-- Surat Pengantar -->
-            <?php if (isset($surat_pengantar) && $surat_pengantar): ?>
+            <?php
+            $butuh_surat_mhs = isset($proposal->butuh_surat_pengantar) ? (int)$proposal->butuh_surat_pengantar : 1;
+            ?>
+            <?php if ($butuh_surat_mhs == 1 && isset($surat_pengantar) && $surat_pengantar): ?>
                 <div class="card mt-4">
                     <div class="card-header bg-success text-white">
                         <i class="bi bi-envelope-check me-2"></i>Surat Pengantar Magang
@@ -166,7 +190,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Tanggal Surat</strong></td>
-                                <td><?= date('d F Y', strtotime($surat_pengantar->tanggal_surat)) ?></td>
+                                <td><?= format_indo('d F Y', strtotime($surat_pengantar->tanggal_surat)) ?></td>
                             </tr>
                             <tr>
                                 <td><strong>Tujuan</strong></td>
@@ -181,7 +205,7 @@
                             <tr>
                                 <td><strong>Download Surat</strong></td>
                                 <td>
-                                    <a href="<?= $surat_pengantar->file_surat ?>" target="_blank" class="btn btn-success">
+                                    <a href="<?= $surat_pengantar->file_surat ?>" target="_blank" class="btn btn-primary">
                                         <i class="bi bi-download me-2"></i>Download Surat Pengantar
                                     </a>
                                 </td>
@@ -189,7 +213,7 @@
                         </table>
                     </div>
                 </div>
-            <?php elseif ($proposal->status_kaprodi == 'disetujui'): ?>
+            <?php elseif ($proposal->status_kaprodi == 'disetujui' && $butuh_surat_mhs == 1): ?>
                 <div class="card mt-4">
                     <div class="card-header">
                         <i class="bi bi-envelope me-2"></i>Surat Pengantar Magang
@@ -209,6 +233,45 @@
                     <a href="<?= base_url('proposal') ?>" class="btn btn-primary">
                         <i class="bi bi-plus-lg me-1"></i>Ajukan Proposal
                     </a>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- Status Balasan Mitra (jika proposal approved) -->
+        <?php if (isset($proposal) && $proposal && $proposal->status_kaprodi == 'disetujui'): ?>
+            <?php $butuh_surat_status = isset($proposal->butuh_surat_pengantar) ? (int)$proposal->butuh_surat_pengantar : 1; ?>
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-inbox-check me-2"></i>Status Balasan Mitra
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Surat Pengantar</h6>
+                            <?php if ($butuh_surat_status == 0): ?>
+                                <div class="badge bg-secondary">Tidak Diperlukan</div>
+                                <small class="d-block mt-2 text-muted">Langsung upload balasan mitra</small>
+                            <?php elseif (isset($surat_pengantar) && $surat_pengantar): ?>
+                                <div class="badge bg-success">Sudah Dibuat</div>
+                                <small class="d-block mt-2"><strong><?= $surat_pengantar->nomor_surat ?></strong></small>
+                            <?php else: ?>
+                                <div class="badge bg-warning">Dalam Proses</div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Balasan Mitra</h6>
+                            <?php if ($proposal->status_mitra == 'diterima'): ?>
+                                <div class="badge bg-success">Diterima ✓</div>
+                                <small class="d-block mt-2 text-success"><strong>Menunggu Penugasan DPL</strong></small>
+                            <?php elseif ($proposal->status_mitra == 'ditolak'): ?>
+                                <div class="badge bg-danger">Ditolak</div>
+                            <?php else: ?>
+                                <div class="badge bg-warning">Menunggu Upload</div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <hr>
+                    <a href="<?= base_url('proposal') ?>" class="btn btn-sm btn-info">Lihat Detail</a>
                 </div>
             </div>
         <?php endif; ?>
@@ -251,7 +314,7 @@
                                 </div>
                                 <div>
                                     <small class="text-muted d-block">Tanggal</small>
-                                    <strong><?= date('d F Y', strtotime($desiminasi->tanggal_desiminasi)) ?></strong>
+                                    <strong><?= format_indo('d F Y', strtotime($desiminasi->tanggal_desiminasi)) ?></strong>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-3">
@@ -261,7 +324,7 @@
                                 </div>
                                 <div>
                                     <small class="text-muted d-block">Waktu</small>
-                                    <strong><?= $desiminasi->waktu_mulai ?></strong>
+                                    <strong><?= date('H:i', strtotime($desiminasi->waktu_mulai)) ?></strong>
                                 </div>
                             </div>
                         </div>
@@ -302,6 +365,17 @@
                                 <i class="bi bi-arrow-right me-1"></i>Detail
                             </a>
                         </div>
+                        <?php if ($hasil_desiminasi->status_laporan_akhir == 'disetujui'): ?>
+                            <div class="alert alert-success mt-3 mb-0 py-2">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <strong>Selamat!</strong> Seluruh proses magang Anda telah selesai.
+                            </div>
+                        <?php elseif (empty($hasil_desiminasi->link_laporan_akhir) && in_array($hasil_desiminasi->status_kelulusan, ['lulus', 'lulus_bersyarat'])): ?>
+                            <div class="alert alert-info mt-3 mb-0 py-2">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Silakan <a href="<?= base_url('desiminasi') ?>" class="alert-link">upload laporan akhir</a> untuk diserahkan ke penguji.
+                            </div>
+                        <?php endif; ?>
                     <?php else: ?>
                         <hr class="my-2">
                         <div class="text-center">
@@ -316,52 +390,7 @@
     </div>
     <div class="col-lg-4">
         <!-- Sebaran Magang -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-pie-chart me-2"></i>Sebaran Magang
-            </div>
-            <div class="card-body">
-                <?php if (isset($sebaran_jenis) && !empty($sebaran_jenis)): ?>
-                    <canvas id="sebaranChartMahasiswa" style="max-height: 200px;"></canvas>
-                    <hr class="my-3">
-                    <?php foreach ($sebaran_jenis as $s): ?>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span><?= strtoupper($s->jenis_magang) ?></span>
-                            <span class="badge bg-secondary"><?= $s->total ?> mahasiswa</span>
-                        </div>
-                    <?php endforeach; ?>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const ctxMhs = document.getElementById('sebaranChartMahasiswa').getContext('2d');
-                            new Chart(ctxMhs, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: [<?php foreach ($sebaran_jenis as $s): ?>'<?= strtoupper($s->jenis_magang) ?>',<?php endforeach; ?>],
-                                    datasets: [{
-                                        data: [<?php foreach ($sebaran_jenis as $s): ?><?= $s->total ?>,<?php endforeach; ?>],
-                                        backgroundColor: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
-                                        borderWidth: 2,
-                                        borderColor: '#fff'
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: true,
-                                    plugins: {
-                                        legend: {
-                                            position: 'bottom',
-                                            labels: { padding: 15, usePointStyle: true }
-                                        }
-                                    }
-                                }
-                            });
-                        });
-                    </script>
-                <?php else: ?>
-                    <p class="text-muted mb-0 small">Data belum tersedia</p>
-                <?php endif; ?>
-            </div>
-        </div>
+        <?php $this->load->view('dashboard/_sebaran_cards', ['filter_url' => base_url('dashboard/mahasiswa/sebaran_filter')]); ?>
 
         <!-- Mitra Kerjasama -->
         <div class="card">
@@ -379,11 +408,7 @@
                             </li>
                         <?php endforeach; ?>
                     </ul>
-                    <?php if (count($mitra) > 5): ?>
-                        <div class="text-center mt-3">
-                            <a href="<?= base_url('info/mitra') ?>" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
-                        </div>
-                    <?php endif; ?>
+
                 <?php else: ?>
                     <p class="text-muted mb-0 small">Data belum tersedia</p>
                 <?php endif; ?>
@@ -391,3 +416,5 @@
         </div>
     </div>
 </div>
+
+

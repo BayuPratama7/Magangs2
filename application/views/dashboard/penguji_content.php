@@ -66,7 +66,7 @@
                                         <td><small><?= substr($p->judul_proposal, 0, 50) ?>...</small></td>
                                         <td>
                                             <a href="<?= base_url('penguji/konfirmasi_terima/' . $p->desiminasi_id) ?>"
-                                                class="btn btn-sm btn-success">
+                                                class="btn btn-sm btn-primary">
                                                 <i class="bi bi-check"></i> Bersedia
                                             </a>
                                             <a href="<?= base_url('penguji/konfirmasi_tolak/' . $p->desiminasi_id) ?>"
@@ -91,6 +91,9 @@
 
     <!-- Jadwal Desiminasi -->
     <div class="col-lg-6">
+        <!-- Sebaran Magang -->
+        <?php $this->load->view('dashboard/_sebaran_cards', ['filter_url' => base_url('dashboard/penguji/sebaran_filter')]); ?>
+
         <div class="card">
             <div class="card-header">
                 <i class="bi bi-calendar-event me-2"></i>Jadwal Menguji
@@ -106,12 +109,12 @@
                                         <small class="text-muted"><?= $j->nim ?></small>
                                     </div>
                                     <span class="badge bg-primary">
-                                        <?= date('d M Y', strtotime($j->tanggal_desiminasi)) ?>
+                                        <?= format_indo('d M Y', strtotime($j->tanggal_desiminasi)) ?>
                                     </span>
                                 </div>
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between">
-                                    <small><i class="bi bi-clock me-1"></i><?= $j->waktu_mulai ?></small>
+                                    <small><i class="bi bi-clock me-1"></i><?= date('H:i', strtotime($j->waktu_mulai)) ?></small>
                                     <small><i class="bi bi-geo-alt me-1"></i><?= $j->ruangan ?? 'Online' ?></small>
                                 </div>
                             </div>
@@ -156,7 +159,7 @@
                                         <td><?= $l->nim ?></td>
                                         <td><?= $l->nama_mahasiswa ?></td>
                                         <td><small><?= $l->judul_proposal ?></small></td>
-                                        <td><?= date('d M Y', strtotime($l->tanggal_desiminasi)) ?></td>
+                                        <td><?= format_indo('d M Y', strtotime($l->tanggal_desiminasi)) ?></td>
                                         <td>
                                             <span class="badge bg-<?= $l->link_laporan_akhir ? 'info' : 'warning' ?>">
                                                 <?= $l->link_laporan_akhir ? 'Sudah Upload' : 'Belum Upload' ?>
@@ -169,7 +172,7 @@
                                                     <i class="bi bi-eye"></i>
                                                 </a>
                                                 <a href="<?= base_url('penguji/laporan_acc/' . $l->hasil_id) ?>"
-                                                    class="btn btn-sm btn-success">
+                                                    class="btn btn-sm btn-primary">
                                                     <i class="bi bi-check"></i> ACC
                                                 </a>
                                                 <a href="<?= base_url('penguji/laporan_revisi/' . $l->hasil_id) ?>"
@@ -194,4 +197,5 @@
             </div>
         </div>
     </div>
-</div>
+</div>
+

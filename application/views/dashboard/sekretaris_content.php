@@ -89,7 +89,11 @@
                                 <tr>
                                     <th>NIM</th>
                                     <th>Nama</th>
-                                    <th>Instansi Tujuan</th>
+                                    <th>Judul Proposal</th>
+                                    <th>Instansi</th>
+                                    <th>Surat Pengantar</th>
+                                    <th>Balasan Mitra</th>
+                                    <th>Pilih DPL</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -98,12 +102,43 @@
                                     <tr>
                                         <td><?= $m->nim ?></td>
                                         <td><?= $m->nama_mahasiswa ?></td>
+                                        <td><small><?= $m->judul_proposal ?></small></td>
                                         <td><?= $m->instansi_tujuan ?></td>
                                         <td>
-                                            <a href="<?= base_url('admin/dpl/assign/' . $m->mahasiswa_id) ?>"
-                                                class="btn btn-sm btn-primary">
-                                                Assign DPL
-                                            </a>
+                                            <?php if (isset($m->butuh_surat_pengantar) && $m->butuh_surat_pengantar == 0): ?>
+                                                <span class="badge bg-info">Tidak Membutuhkan</span>
+                                            <?php elseif (!empty($m->file_surat)): ?>
+                                                <span class="badge bg-success">Sudah</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-warning">Belum</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if (isset($m->status_mitra) && $m->status_mitra == 'diterima'): ?>
+                                                <span class="badge bg-success">Diterima ✓</span>
+                                            <?php elseif (isset($m->status_mitra) && $m->status_mitra == 'ditolak'): ?>
+                                                <span class="badge bg-danger">Ditolak</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-warning">Menunggu</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td colspan="2">
+                                            <?php if (isset($m->status_mitra) && $m->status_mitra == 'diterima'): ?>
+                                                <form method="post" action="<?= base_url('admin/assign_dpl') ?>" class="d-flex align-items-center gap-2 m-0">
+                                                    <input type="hidden" name="mahasiswa_id" value="<?= $m->mahasiswa_id ?>">
+                                                    <select name="dosen_id" class="form-select form-select-sm" style="width: auto;" required>
+                                                        <option value="">-- Pilih DPL --</option>
+                                                        <?php foreach ($dosen_list as $d): ?>
+                                                            <option value="<?= $d->dosen_id ?>"><?= $d->nama_dosen ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                    <button type="submit" class="btn btn-sm btn-primary">
+                                                        <i class="bi bi-check me-1"></i>Assign
+                                                    </button>
+                                                </form>
+                                            <?php else: ?>
+                                                <small class="text-muted">Tunggu balasan mitra</small>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -133,9 +168,9 @@
                         <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
                             <div>
                                 <strong class="d-block"><?= $j->nama_mahasiswa ?></strong>
-                                <small class="text-muted"><?= date('d M Y', strtotime($j->tanggal_desiminasi)) ?></small>
+                                <small class="text-muted"><?= format_indo('d M Y', strtotime($j->tanggal_desiminasi)) ?></small>
                             </div>
-                            <span class="badge bg-primary"><?= $j->waktu_mulai ?></span>
+                            <span class="badge bg-primary"><?= date('H:i', strtotime($j->waktu_mulai)) ?></span>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -143,6 +178,9 @@
                 <?php endif; ?>
             </div>
         </div>
+
+        <!-- Sebaran Magang -->
+        <?php $this->load->view('dashboard/_sebaran_cards', ['filter_url' => base_url('dashboard/sekretaris/sebaran_filter')]); ?>
 
         <!-- Dashboard Content Stats -->
         <div class="card">
@@ -166,58 +204,6 @@
             </div>
         </div>
 
-        <!-- Sebaran Jenis Magang -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <i class="bi bi-pie-chart me-2"></i>Sebaran Jenis Magang
-            </div>
-            <div class="card-body">
-                <?php if (isset($sebaran_jenis) && !empty($sebaran_jenis)): ?>
-                    <canvas id="sebaranChartSekretaris" style="max-height: 200px;"></canvas>
-                    <hr class="my-3">
-                    <?php
-                    $colors = ['reguler' => 'primary', 'bumn' => 'success', 'mbkm' => 'warning'];
-                    foreach ($sebaran_jenis as $s):
-                    ?>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>
-                                <span class="badge bg-<?= $colors[$s->jenis_magang] ?? 'secondary' ?> me-2">&nbsp;</span>
-                                <?= strtoupper($s->jenis_magang) ?>
-                            </span>
-                            <strong><?= $s->total ?></strong>
-                        </div>
-                    <?php endforeach; ?>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const ctxSekretaris = document.getElementById('sebaranChartSekretaris').getContext('2d');
-                            new Chart(ctxSekretaris, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: [<?php foreach ($sebaran_jenis as $s): ?>'<?= strtoupper($s->jenis_magang) ?>',<?php endforeach; ?>],
-                                    datasets: [{
-                                        data: [<?php foreach ($sebaran_jenis as $s): ?><?= $s->total ?>,<?php endforeach; ?>],
-                                        backgroundColor: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
-                                        borderWidth: 2,
-                                        borderColor: '#fff'
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: true,
-                                    plugins: {
-                                        legend: {
-                                            position: 'bottom',
-                                            labels: { padding: 10, usePointStyle: true, font: { size: 11 } }
-                                        }
-                                    }
-                                }
-                            });
-                        });
-                    </script>
-                <?php else: ?>
-                    <p class="text-muted mb-0">Data belum tersedia</p>
-                <?php endif; ?>
-            </div>
-        </div>
     </div>
-</div>
+</div>
+

@@ -26,7 +26,18 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tahun Akademik</label>
+                        <select name="tahun_akademik" class="form-select" required>
+                            <option value="">-- Pilih Tahun Akademik --</option>
+                            <?php if (isset($tahun_akademik_list)): ?>
+                                <?php foreach ($tahun_akademik_list as $ta): ?>
+                                    <option value="<?= htmlspecialchars($ta->tahun_akademik) ?>"><?= htmlspecialchars($ta->tahun_akademik) ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
                         <label class="form-label">Jenis Magang</label>
                         <select name="jenis_magang" class="form-select" required>
                             <option value="">-- Pilih Jenis Magang --</option>
@@ -35,10 +46,10 @@
                             <option value="mbkm">MBKM</option>
                         </select>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label class="form-label">Tanggal Pengajuan</label>
                         <input type="date" name="tanggal_pengajuan" class="form-control" required
-                            value="<?= date('Y-m-d') ?>">
+                            value="<?= format_indo('Y-m-d') ?>">
                     </div>
                 </div>
 
@@ -130,6 +141,10 @@
                     <td><?= $proposal->instansi_tujuan ?></td>
                 </tr>
                 <tr>
+                    <th>Tahun Akademik</th>
+                    <td><?= isset($proposal->tahun_akademik) ? htmlspecialchars($proposal->tahun_akademik) : '-' ?></td>
+                </tr>
+                <tr>
                     <th>Jenis Magang</th>
                     <td><span class="badge bg-primary"><?= strtoupper($proposal->jenis_magang) ?></span></td>
                 </tr>
@@ -139,7 +154,7 @@
                 </tr>
                 <tr>
                     <th>Tanggal Pengajuan</th>
-                    <td><?= isset($proposal->tanggal_pengajuan) ? date('d M Y', strtotime($proposal->tanggal_pengajuan)) : '-' ?>
+                    <td><?= isset($proposal->tanggal_pengajuan) ? format_indo('d M Y', strtotime($proposal->tanggal_pengajuan)) : '-' ?>
                     </td>
                 </tr>
                 <tr>
@@ -243,7 +258,18 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tahun Akademik</label>
+                            <select name="tahun_akademik" class="form-select" required>
+                                <option value="">-- Pilih Tahun Akademik --</option>
+                                <?php if (isset($tahun_akademik_list)): ?>
+                                    <?php foreach ($tahun_akademik_list as $ta): ?>
+                                        <option value="<?= htmlspecialchars($ta->tahun_akademik) ?>" <?= (isset($proposal->tahun_akademik) && $proposal->tahun_akademik == $ta->tahun_akademik) ? 'selected' : '' ?>><?= htmlspecialchars($ta->tahun_akademik) ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Jenis Magang</label>
                             <select name="jenis_magang" class="form-select" required>
                                 <option value="reguler" <?= $proposal->jenis_magang == 'reguler' ? 'selected' : '' ?>>Reguler</option>
@@ -251,10 +277,10 @@
                                 <option value="mbkm" <?= $proposal->jenis_magang == 'mbkm' ? 'selected' : '' ?>>MBKM</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Tanggal Pengajuan</label>
                             <input type="date" name="tanggal_pengajuan" class="form-control" required
-                                value="<?= date('Y-m-d') ?>">
+                                value="<?= format_indo('Y-m-d') ?>">
                         </div>
                     </div>
 
@@ -353,7 +379,18 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tahun Akademik</label>
+                            <select name="tahun_akademik" class="form-select" required>
+                                <option value="">-- Pilih Tahun Akademik --</option>
+                                <?php if (isset($tahun_akademik_list)): ?>
+                                    <?php foreach ($tahun_akademik_list as $ta): ?>
+                                        <option value="<?= htmlspecialchars($ta->tahun_akademik) ?>" <?= (isset($proposal->tahun_akademik) && $proposal->tahun_akademik == $ta->tahun_akademik) ? 'selected' : '' ?>><?= htmlspecialchars($ta->tahun_akademik) ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Jenis Magang</label>
                             <select name="jenis_magang" class="form-select" required>
                                 <option value="reguler" <?= $proposal->jenis_magang == 'reguler' ? 'selected' : '' ?>>Reguler</option>
@@ -361,10 +398,10 @@
                                 <option value="mbkm" <?= $proposal->jenis_magang == 'mbkm' ? 'selected' : '' ?>>MBKM</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Tanggal Pengajuan</label>
                             <input type="date" name="tanggal_pengajuan" class="form-control" required
-                                value="<?= date('Y-m-d') ?>">
+                                value="<?= format_indo('Y-m-d') ?>">
                         </div>
                     </div>
 
@@ -442,11 +479,13 @@
                     <?php if (isset($surat) && $surat): ?>
                     <!-- 1. SURAT PENGANTAR (hanya jika butuh dan sudah ready) -->
                     <h6 class="mb-3"><i class="bi bi-file-earmark me-1"></i>Surat Pengantar</h6>
-                        <div class="alert alert-info mb-3">
-                            <strong><?= $surat->nomor_surat ?></strong><br>
-                            Tanggal: <?= date('d M Y', strtotime($surat->tanggal_surat)) ?><br>
-                            <a href="<?= $surat->file_surat ?>" target="_blank" class="btn btn-sm btn-primary mt-2">
-                                <i class="bi bi-download me-1"></i>Download Surat
+                        <div class="alert alert-info mb-3 d-flex justify-content-between align-items-center border-0 shadow-sm" style="background-color: #e8f4fd;">
+                            <div>
+                                <h6 class="mb-1 text-dark fw-bold"><i class="bi bi-file-text me-2 text-primary"></i><?= htmlspecialchars($surat->nomor_surat) ?></h6>
+                                <p class="mb-0 text-muted small ms-4"><i class="bi bi-calendar-event me-1"></i>Tanggal: <?= format_indo('d M Y', strtotime($surat->tanggal_surat)) ?></p>
+                            </div>
+                            <a href="<?= $surat->file_surat ?>" target="_blank" class="btn btn-primary shadow-sm px-4">
+                                <i class="bi bi-download me-2"></i>Download Surat
                             </a>
                         </div>
                         <!-- 2. BALASAN MITRA -->
@@ -493,7 +532,18 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Tahun Akademik</label>
+                                        <select name="tahun_akademik" class="form-select" required>
+                                            <option value="">-- Pilih Tahun Akademik --</option>
+                                            <?php if (isset($tahun_akademik_list)): ?>
+                                                <?php foreach ($tahun_akademik_list as $ta): ?>
+                                                    <option value="<?= htmlspecialchars($ta->tahun_akademik) ?>"><?= htmlspecialchars($ta->tahun_akademik) ?></option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
                                         <label class="form-label">Jenis Magang</label>
                                         <select name="jenis_magang" class="form-select" required>
                                             <option value="">-- Pilih Jenis Magang --</option>
@@ -502,10 +552,10 @@
                                             <option value="mbkm">MBKM</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-3">
                                         <label class="form-label">Tanggal Pengajuan</label>
                                         <input type="date" name="tanggal_pengajuan" class="form-control" required
-                                            value="<?= date('Y-m-d') ?>">
+                                            value="<?= format_indo('Y-m-d') ?>">
                                     </div>
                                 </div>
 

@@ -26,11 +26,13 @@ class Desiminasi extends CI_Controller
      */
     public function index()
     {
-        $pending = $this->Desiminasi_model->get_all_pending();
+        $pengajuan = $this->Desiminasi_model->get_all_pengajuan();
+        $penguji_list = $this->Dosen_model->get_all_penguji();
 
         $data = [
             'page_title' => 'Pengajuan Desiminasi',
-            'pending' => $pending
+            'pengajuan' => $pengajuan,
+            'penguji_list' => $penguji_list
         ];
 
         $data['content'] = $this->load->view('sekretaris/desiminasi_index', $data, TRUE);
@@ -50,12 +52,21 @@ class Desiminasi extends CI_Controller
         }
 
         // Get daftar penguji (dosen dengan is_penguji = true)
-        $penguji_list = $this->Dosen_model->get_all_penguji();
+        $penguji_list_raw = $this->Dosen_model->get_all_penguji();
+        
+        // Exclude the student's DPL from the examiner list
+        $penguji_list = array_filter($penguji_list_raw, function($p) use ($desiminasi) {
+            return $p->dosen_id != $desiminasi->dosen_dpl_id;
+        });
+
+        // Get existing jadwal if any
+        $jadwal = $this->Jadwal_model->get_by_desiminasi($desiminasi_id);
 
         $data = [
             'page_title' => 'Proses Desiminasi',
             'desiminasi' => $desiminasi,
-            'penguji_list' => $penguji_list
+            'penguji_list' => $penguji_list,
+            'jadwal' => $jadwal
         ];
 
         $data['content'] = $this->load->view('sekretaris/desiminasi_proses', $data, TRUE);
@@ -86,13 +97,14 @@ class Desiminasi extends CI_Controller
         // Get desiminasi detail untuk mahasiswa_id
         $desiminasi = $this->Desiminasi_model->get_by_id($desiminasi_id);
 
-        // 1. Update desiminasi - assign penguji
+        // 1. Update desiminasi - assign penguji dan reset konfirmasi
         $this->Desiminasi_model->update($desiminasi_id, [
             'penguji_id' => $penguji_id,
-            'status_pengajuan' => 'diterima'
+            'status_pengajuan' => 'diterima',
+            'konfirmasi_penguji' => 'menunggu'
         ]);
 
-        // 2. Insert jadwal desiminasi
+        // 2. Insert atau Update jadwal desiminasi
         $jadwal_data = [
             'desiminasi_id' => $desiminasi_id,
             'mahasiswa_id' => $desiminasi->mahasiswa_id,
@@ -103,7 +115,13 @@ class Desiminasi extends CI_Controller
             'link_online' => $link_online,
             'status' => 'menunggu_konfirmasi'
         ];
-        $this->Jadwal_model->insert($jadwal_data);
+
+        $existing_jadwal = $this->Jadwal_model->get_by_desiminasi($desiminasi_id);
+        if ($existing_jadwal) {
+            $this->Jadwal_model->update($existing_jadwal->jadwal_id, $jadwal_data);
+        } else {
+            $this->Jadwal_model->insert($jadwal_data);
+        }
 
         // 3. Buat record hasil_desiminasi agar penguji bisa input hasil & mahasiswa bisa upload laporan
         $this->load->model('Administrasi_model');

@@ -14,7 +14,7 @@ class Proposal extends CI_Controller
 
     public function index()
     {
-        $this->load->model(['Mahasiswa_model', 'Administrasi_model']);
+        $this->load->model(['Mahasiswa_model', 'Administrasi_model', 'Dashboard_model']);
 
         $user_id = $this->session->userdata('user_id');
 
@@ -39,10 +39,14 @@ class Proposal extends CI_Controller
         // Load provinsi data
         $provinsi_list = $this->db->get('provinsi')->result();
 
+        // Load tahun akademik list
+        $tahun_akademik_list = $this->Dashboard_model->get_available_tahun_akademik();
+
         $data['mahasiswa'] = $mahasiswa_with_dpl;
         $data['proposal'] = $proposal;
         $data['surat'] = $surat;
         $data['provinsi_list'] = $provinsi_list;
+        $data['tahun_akademik_list'] = $tahun_akademik_list;
         $data['page_title'] = 'Proposal Magang';
         $data['content'] = $this->load->view('proposal/index', $data, TRUE);
         $this->load->view('layouts/main', $data);
@@ -65,11 +69,13 @@ class Proposal extends CI_Controller
         $data = [
             'mahasiswa_id' => $mahasiswa->mahasiswa_id,
             'judul_proposal' => $this->input->post('judul_proposal'),
+            'tahun_akademik' => $this->input->post('tahun_akademik'),
             'instansi_tujuan' => $this->input->post('instansi_tujuan'),
             'jenis_magang' => $this->input->post('jenis_magang'),
             'provinsi' => $this->input->post('provinsi'),
             'tanggal_pengajuan' => $this->input->post('tanggal_pengajuan'),
             'link_proposal' => $this->input->post('link_proposal'),
+            'alamat_instansi' => $this->input->post('alamat_instansi'),
             'butuh_surat_pengantar' => $this->input->post('butuh_surat_pengantar'),
             'status_koordinator' => 'menunggu',
             'status_kaprodi' => 'menunggu',
@@ -77,6 +83,14 @@ class Proposal extends CI_Controller
             'link_surat_penerimaan' => null,
             'tanggal_balasan_mitra' => null
         ];
+
+        // Update profil mahasiswa dengan data instansi
+        $update_mahasiswa = [
+            'kelas' => $this->input->post('instansi_tujuan'),
+            'no_hp' => $this->input->post('alamat_instansi')
+        ];
+        $this->db->where('mahasiswa_id', $mahasiswa->mahasiswa_id)
+                 ->update('mahasiswa', $update_mahasiswa);
 
         $existing = $this->Proposal_model
             ->get_by_mahasiswa($mahasiswa->mahasiswa_id);
@@ -145,6 +159,7 @@ class Proposal extends CI_Controller
 
         $data = [
             'judul_proposal' => $this->input->post('judul_proposal'),
+            'tahun_akademik' => $this->input->post('tahun_akademik'),
             'instansi_tujuan' => $this->input->post('instansi_tujuan'),
             'jenis_magang' => $this->input->post('jenis_magang'),
             'provinsi' => $this->input->post('provinsi'),
@@ -157,6 +172,14 @@ class Proposal extends CI_Controller
             'catatan_koordinator' => null,
             'catatan_kaprodi' => null
         ];
+
+        // Update profil mahasiswa dengan data instansi
+        $update_mahasiswa = [
+            'kelas' => $this->input->post('instansi_tujuan'),
+            'no_hp' => $this->input->post('alamat_instansi')
+        ];
+        $this->db->where('mahasiswa_id', $mahasiswa->mahasiswa_id)
+                 ->update('mahasiswa', $update_mahasiswa);
 
         if ($this->Proposal_model->update($proposal_id, $data)) {
             $this->session->set_flashdata('success', 'Proposal berhasil diajukan ulang dan diarahkan ke Koordinator untuk review.');

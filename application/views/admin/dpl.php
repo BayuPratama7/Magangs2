@@ -157,7 +157,7 @@
                                                 <?= isset($b->status_mitra) ? ucfirst($b->status_mitra) : 'menunggu' ?>
                                             </span>
                                         </td>
-                                        <td><?= (isset($b->tanggal_balasan_mitra) && $b->tanggal_balasan_mitra) ? date('d M Y', strtotime($b->tanggal_balasan_mitra)) : '-' ?></td>
+                                        <td><?= (isset($b->tanggal_balasan_mitra) && $b->tanggal_balasan_mitra) ? format_indo('d M Y', strtotime($b->tanggal_balasan_mitra)) : '-' ?></td>
                                         <td>
                                             <?php if (isset($b->link_surat_penerimaan) && $b->link_surat_penerimaan): ?>
                                                 <a href="<?= $b->link_surat_penerimaan ?>" target="_blank" class="btn btn-sm btn-outline-primary">

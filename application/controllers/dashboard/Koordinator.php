@@ -21,6 +21,8 @@ class Koordinator extends CI_Controller
 
     public function index()
     {
+        $this->Mahasiswa_model->sync_all_statuses();
+
         // Get pending proposals
         $pending_proposals = $this->Proposal_model->get_pending_koordinator();
 
@@ -63,6 +65,12 @@ class Koordinator extends CI_Controller
         // Get sebaran jenis magang
         $sebaran_jenis = $this->Dashboard_model->get_sebaran_by_jenis();
 
+        // Get provinsi list for filter
+        $provinsi_list = $this->Dashboard_model->get_provinsi_list();
+
+        // Get sebaran by provinsi
+        $sebaran_provinsi = $this->Dashboard_model->get_sebaran_by_provinsi();
+
         $data = [
             'page_title' => 'Dashboard Koordinator',
             'pending_proposals' => $pending_proposals,
@@ -70,10 +78,57 @@ class Koordinator extends CI_Controller
             'recent_hasil' => $recent_hasil,
             'mahasiswa_progress' => $mahasiswa_progress,
             'stats' => $stats,
-            'sebaran_jenis' => $sebaran_jenis
+            'sebaran_jenis' => $sebaran_jenis,
+            'tahun_akademik_list' => $this->Dashboard_model->get_tahun_akademik_list(),
+            'provinsi_list' => $provinsi_list,
+            'sebaran_provinsi' => $sebaran_provinsi
         ];
 
         $data['content'] = $this->load->view('dashboard/koordinator_content', $data, TRUE);
         $this->load->view('layouts/main', $data);
+    }
+
+    /**
+     * AJAX endpoint: filter sebaran data
+     * mode=jenis&provinsi=xxx  → get jenis breakdown filtered by provinsi
+     * mode=provinsi            → get provinsi breakdown (all)
+     */
+    public function sebaran_filter()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $mode = $this->input->get('mode') ?? 'jenis';
+
+        if ($mode === 'provinsi') {
+            // Return sebaran grouped by provinsi
+            $data = $this->Dashboard_model->get_sebaran_by_provinsi();
+            $result = [];
+            foreach ($data as $d) {
+                $result[] = [
+                    'label' => $d->provinsi,
+                    'total' => (int) $d->total
+                ];
+            }
+        } else {
+            // Return sebaran by jenis, optionally filtered by provinsi
+            $provinsi = $this->input->get('provinsi');
+            $tahun = $this->input->get('tahun');
+            $jenis = $this->input->get('jenis');
+            $data = $this->Dashboard_model->get_sebaran_by_jenis_provinsi($provinsi, $tahun, $jenis);
+            $result = [];
+            foreach ($data as $d) {
+                $result[] = [
+                    'label' => strtoupper($d->jenis_magang),
+                    'key' => $d->jenis_magang,
+                    'total' => (int) $d->total
+                ];
+            }
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($result));
     }
 }

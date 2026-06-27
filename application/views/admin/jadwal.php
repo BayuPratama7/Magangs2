@@ -36,7 +36,7 @@
                                         <td><small><?= substr($d->judul_proposal, 0, 50) ?>...</small></td>
                                         <td><span class="badge bg-primary"><?= $d->nama_penguji ?></span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-success btn-buat-jadwal"
+                                            <button class="btn btn-sm btn-primary btn-buat-jadwal"
                                                 data-desiminasi-id="<?= $d->desiminasi_id ?>"
                                                 data-mahasiswa-id="<?= $d->mahasiswa_id ?>"
                                                 data-nama="<?= htmlspecialchars($d->nama_mahasiswa) ?>"
@@ -82,8 +82,8 @@
                             <tbody>
                                 <?php foreach ($jadwal_list as $j): ?>
                                     <tr>
-                                        <td><?= date('d M Y', strtotime($j->tanggal_desiminasi)) ?></td>
-                                        <td><?= $j->waktu_mulai ?> - <?= $j->waktu_selesai ?></td>
+                                        <td><?= format_indo('d M Y', strtotime($j->tanggal_desiminasi)) ?></td>
+                                        <td><?= date('H:i', strtotime($j->waktu_mulai)) ?> - <?= date('H:i', strtotime($j->waktu_selesai)) ?></td>
                                         <td>
                                             <strong><?= $j->nama_mahasiswa ?></strong><br>
                                             <small class="text-muted"><?= $j->nim ?></small>
@@ -152,7 +152,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">Simpan Jadwal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
                 </div>
             </form>
         </div>
@@ -181,3 +181,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+

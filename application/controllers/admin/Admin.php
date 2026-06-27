@@ -125,8 +125,6 @@ class Admin extends CI_Controller
             'nama_mahasiswa' => $this->input->post('nama_mahasiswa'),
             'prodi' => $this->input->post('prodi'),
             'angkatan' => $this->input->post('angkatan'),
-            'kelas' => $this->input->post('kelas'),
-            'no_hp' => $this->input->post('no_hp'),
             'alamat' => $this->input->post('alamat'),
             'status_magang' => $this->input->post('status_magang')
         ];
@@ -138,7 +136,6 @@ class Admin extends CI_Controller
                          'nama_lengkap' => $this->input->post('nama_mahasiswa'),
                          'updated_at' => date('Y-m-d H:i:s')
                      ]);
-
             $this->session->set_flashdata('success', 'Data mahasiswa berhasil diperbarui');
         } else {
             $this->session->set_flashdata('error', 'Gagal memperbarui data mahasiswa');
@@ -224,7 +221,7 @@ class Admin extends CI_Controller
 
         if ($this->Administrasi_model->assign_dpl($mahasiswa_id, $dosen_id)) {
             // Update status mahasiswa
-            $this->Mahasiswa_model->update_status($mahasiswa_id, 'diterima');
+            $this->Mahasiswa_model->update_status($mahasiswa_id, 'sedang_magang');
             $this->session->set_flashdata('success', 'DPL berhasil ditugaskan');
         } else {
             $this->session->set_flashdata('error', 'Gagal menugaskan DPL');
@@ -240,7 +237,7 @@ class Admin extends CI_Controller
     public function surat()
     {
         // Get mahasiswa yang belum ada surat dan BUTUH surat pengantar
-        $this->db->select('m.*, p.proposal_id, p.instansi_tujuan, p.alamat_instansi')
+        $this->db->select('m.*, p.proposal_id, p.instansi_tujuan, p.alamat_instansi, p.jenis_magang')
             ->from('mahasiswa m')
             ->join('proposal_magang p', 'p.mahasiswa_id = m.mahasiswa_id')
             ->join('surat_pengantar s', 's.mahasiswa_id = m.mahasiswa_id', 'left')
@@ -258,6 +255,37 @@ class Admin extends CI_Controller
         ];
 
         $data['content'] = $this->load->view('admin/surat', $data, TRUE);
+        $this->load->view('layouts/main', $data);
+    }
+
+    public function detail_proposal($id = null)
+    {
+        if (!$id) {
+            die("Error: Proposal ID is missing from the URL.");
+        }
+        $proposal = $this->Proposal_model->get_by_id($id);
+        if (!$proposal) {
+            die("Proposal not found for ID: " . $id);
+        }
+
+        // Get Mahasiswa & DPL info
+        $dpl = null;
+        $mahasiswa = null;
+        if ($proposal->mahasiswa_id) {
+            $mahasiswa = $this->db->get_where('mahasiswa', ['mahasiswa_id' => $proposal->mahasiswa_id])->row();
+            if ($mahasiswa && $mahasiswa->dosen_dpl_id) {
+                $dpl = $this->db->get_where('dosen', ['dosen_id' => $mahasiswa->dosen_dpl_id])->row();
+            }
+        }
+
+        $data = [
+            'page_title' => 'Detail Proposal',
+            'proposal' => $proposal,
+            'mahasiswa' => $mahasiswa,
+            'dpl' => $dpl
+        ];
+
+        $data['content'] = $this->load->view('admin/detail_proposal', $data, TRUE);
         $this->load->view('layouts/main', $data);
     }
 
@@ -283,39 +311,6 @@ class Admin extends CI_Controller
         }
 
         redirect('admin/surat');
-    }
-
-    // ==========================================
-    // PENUGASAN PENGUJI
-    // ==========================================
-
-    public function penguji()
-    {
-        $pending = $this->Desiminasi_model->get_all_pending();
-        $penguji_list = $this->Dosen_model->get_all_penguji();
-
-        $data = [
-            'page_title' => 'Penugasan Penguji Desiminasi',
-            'pending' => $pending,
-            'penguji_list' => $penguji_list
-        ];
-
-        $data['content'] = $this->load->view('admin/penguji', $data, TRUE);
-        $this->load->view('layouts/main', $data);
-    }
-
-    public function assign_penguji()
-    {
-        $desiminasi_id = $this->input->post('desiminasi_id');
-        $penguji_id = $this->input->post('penguji_id');
-
-        if ($this->Desiminasi_model->assign_penguji($desiminasi_id, $penguji_id)) {
-            $this->session->set_flashdata('success', 'Penguji berhasil ditugaskan');
-        } else {
-            $this->session->set_flashdata('error', 'Gagal menugaskan penguji');
-        }
-
-        redirect('admin/penguji');
     }
 
     // ==========================================
@@ -442,15 +437,19 @@ class Admin extends CI_Controller
 
     public function sebaran()
     {
-        $sebaran_list = $this->Dashboard_model->get_all_sebaran();
-        $periode_list = $this->Dashboard_model->get_available_periode();
+        $selected_tahun = $this->input->get('tahun_akademik');
+        $selected_jenis = $this->input->get('jenis_magang');
+        $sebaran_list = $this->Dashboard_model->get_all_sebaran($selected_tahun, $selected_jenis);
+        $tahun_akademik_list = $this->Dashboard_model->get_available_tahun_akademik();
         $provinsi_list = $this->db->get('provinsi')->result();
 
         $data = [
             'page_title' => 'Kelola Sebaran Magang',
             'sebaran_list' => $sebaran_list,
-            'periode_list' => $periode_list,
-            'provinsi_list' => $provinsi_list
+            'tahun_akademik_list' => $tahun_akademik_list,
+            'provinsi_list' => $provinsi_list,
+            'selected_tahun' => $selected_tahun,
+            'selected_jenis' => $selected_jenis
         ];
 
         $data['content'] = $this->load->view('admin/sebaran', $data, TRUE);
@@ -462,10 +461,10 @@ class Admin extends CI_Controller
         $user_id = $this->session->userdata('user_id');
 
         $data = [
-            'periode' => $this->input->post('periode'),
+            'periode' => $this->input->post('tahun_akademik'), // Using tahun_akademik as periode fallback
             'tahun_akademik' => $this->input->post('tahun_akademik'),
             'semester' => $this->input->post('semester'),
-            'wilayah' => $this->input->post('wilayah'),
+            'wilayah' => '-',
             'provinsi' => $this->input->post('provinsi'),
             'jenis_magang' => $this->input->post('jenis_magang'),
             'jumlah_mahasiswa' => $this->input->post('jumlah_mahasiswa'),
@@ -482,8 +481,46 @@ class Admin extends CI_Controller
         redirect('admin/sebaran');
     }
 
+    public function edit_sebaran($id)
+    {
+        $data = [
+            'tahun_akademik' => $this->input->post('tahun_akademik'),
+            'provinsi' => $this->input->post('provinsi'),
+            'jenis_magang' => $this->input->post('jenis_magang'),
+            'jumlah_mahasiswa' => $this->input->post('jumlah_mahasiswa'),
+            'nama_instansi' => $this->input->post('nama_instansi')
+        ];
+
+        if ($id == 0) {
+            // Override dynamic data: insert it into sebaran_magang
+            $data['semester'] = 'ganjil'; // Default value since it's removed from view
+            $data['wilayah'] = '-';
+            $data['created_by'] = $this->session->userdata('user_id');
+            
+            if ($this->Dashboard_model->insert_sebaran($data)) {
+                $this->session->set_flashdata('success', 'Data berhasil diperbarui dan disimpan sebagai data manual');
+            } else {
+                $this->session->set_flashdata('error', 'Gagal menyimpan data sebaran');
+            }
+        } else {
+            if ($this->Dashboard_model->update_sebaran($id, $data)) {
+                $this->session->set_flashdata('success', 'Data sebaran berhasil diperbarui');
+            } else {
+                $this->session->set_flashdata('error', 'Gagal memperbarui data sebaran');
+            }
+        }
+
+        redirect('admin/sebaran');
+    }
+
     public function delete_sebaran($id)
     {
+        if ($id == 0) {
+            $this->session->set_flashdata('error', 'Data otomatis dari mahasiswa tidak dapat dihapus secara manual. Hapus proposal terkait jika ingin mengubah angkanya.');
+            redirect('admin/sebaran');
+            return;
+        }
+
         if ($this->Dashboard_model->delete_sebaran($id)) {
             $this->session->set_flashdata('success', 'Data sebaran berhasil dihapus');
         } else {

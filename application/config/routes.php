@@ -75,6 +75,8 @@ $route['dashboard/penguji'] = 'dashboard/penguji';
 // ==========================================
 $route['proposal'] = 'proposal/proposal/index';
 $route['proposal/store'] = 'proposal/proposal/store';
+$route['proposal/resubmit/(:num)'] = 'proposal/proposal/resubmit/$1';
+$route['proposal/upload_balasan/(:num)'] = 'proposal/proposal/upload_balasan/$1';
 $route['proposal/koordinator'] = 'koordinator/index';
 $route['proposal/koordinator/acc/(:num)'] = 'koordinator/acc/$1';
 $route['proposal/koordinator/reject/(:num)'] = 'koordinator/reject/$1';
@@ -119,8 +121,8 @@ $route['admin/dpl'] = 'admin/admin/dpl';
 $route['admin/assign_dpl'] = 'admin/admin/assign_dpl';
 $route['admin/surat'] = 'admin/admin/surat';
 $route['admin/create_surat'] = 'admin/admin/create_surat';
-$route['admin/penguji'] = 'admin/admin/penguji';
-$route['admin/assign_penguji'] = 'admin/admin/assign_penguji';
+$route['admin/detail_proposal'] = 'admin/admin/detail_proposal';
+$route['admin/detail_proposal/(:any)'] = 'admin/admin/detail_proposal/$1';
 $route['admin/jadwal'] = 'admin/admin/jadwal';
 $route['admin/create_jadwal'] = 'admin/admin/create_jadwal';
 $route['admin/mitra'] = 'admin/admin/mitra';
@@ -128,6 +130,7 @@ $route['admin/create_mitra'] = 'admin/admin/create_mitra';
 $route['admin/delete_mitra/(:num)'] = 'admin/admin/delete_mitra/$1';
 $route['admin/sebaran'] = 'admin/admin/sebaran';
 $route['admin/create_sebaran'] = 'admin/admin/create_sebaran';
+$route['admin/edit_sebaran/(:num)'] = 'admin/admin/edit_sebaran/$1';
 $route['admin/delete_sebaran/(:num)'] = 'admin/admin/delete_sebaran/$1';
 
 // ==========================================
@@ -154,8 +157,9 @@ $route['dosen/jadwal'] = 'dosen/dosencontroller/jadwal';
 // PENGUJI ROUTES
 // ==========================================
 $route['penguji/konfirmasi'] = 'penguji/pengujicontroller/konfirmasi';
+$route['penguji/detail/(:num)'] = 'penguji/pengujicontroller/detail/$1';
 $route['penguji/konfirmasi_terima/(:num)'] = 'penguji/pengujicontroller/konfirmasi_terima/$1';
-$route['penguji/konfirmasi_tolak/(:num)'] = 'penguji/pengujicontroller/konfirmasi_tolak/$1';
+$route['penguji/proses_ubah_jadwal/(:num)'] = 'penguji/pengujicontroller/proses_ubah_jadwal/$1';
 $route['penguji/jadwal'] = 'penguji/pengujicontroller/jadwal';
 $route['penguji/input_hasil/(:num)'] = 'penguji/pengujicontroller/input_hasil/$1';
 $route['penguji/simpan_hasil/(:num)'] = 'penguji/pengujicontroller/simpan_hasil/$1';

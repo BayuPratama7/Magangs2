@@ -20,6 +20,7 @@
                             <th>Mahasiswa</th>
                             <th>Judul Proposal</th>
                             <th>Instansi</th>
+                            <th>Tahun Akademik</th>
                             <th>Link</th>
                             <th>Status Koordinator</th>
                             <th>Aksi</th>
@@ -36,6 +37,7 @@
                                 </td>
                                 <td><?= $p->judul_proposal ?></td>
                                 <td><?= $p->instansi_tujuan ?></td>
+                                <td><?= isset($p->tahun_akademik) ? $p->tahun_akademik : '-' ?></td>
                                 <td>
                                     <a href="<?= $p->link_proposal ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-box-arrow-up-right"></i> Lihat
@@ -48,7 +50,7 @@
                                 </td>
                                 <td>
                                     <a href="<?= base_url('proposal/kaprodi/acc/' . $p->proposal_id) ?>"
-                                        class="btn btn-sm btn-success" onclick="return confirm('ACC Final proposal ini?')">
+                                        class="btn btn-sm btn-primary" onclick="return confirm('ACC Final proposal ini?')">
                                         <i class="bi bi-check2-all me-1"></i>ACC Final
                                     </a>
                                     <button class="btn btn-sm btn-danger" data-bs-toggle="modal"

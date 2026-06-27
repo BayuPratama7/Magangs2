@@ -63,7 +63,7 @@
                                     <th>Bulan</th>
                                     <th>Link</th>
                                     <th>Status DPL</th>
-                                    <th>Status Koordinator</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -97,16 +97,7 @@
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td>
-                                            <?php if ($l): ?>
-                                                <span
-                                                    class="badge badge-<?= $l->status_koordinator == 'sudah_review' ? 'disetujui' : 'menunggu' ?>">
-                                                    <?= ucfirst(str_replace('_', ' ', $l->status_koordinator)) ?>
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
-                                        </td>
+
                                     </tr>
                                 <?php endfor; ?>
                             </tbody>

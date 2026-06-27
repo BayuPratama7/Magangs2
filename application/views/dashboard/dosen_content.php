@@ -157,13 +157,13 @@
                                             <small class="text-muted"><?= $l->nim ?></small>
                                         </td>
                                         <td><span class="badge bg-secondary"><?= ucfirst($l->jenis_laporan) ?></span></td>
-                                        <td><?= date('d M Y', strtotime($l->tanggal_upload)) ?></td>
+                                        <td><?= format_indo('d M Y', strtotime($l->tanggal_upload)) ?></td>
                                         <td>
                                             <a href="<?= $l->link_laporan ?>" target="_blank"
                                                 class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
                                                 data-bs-target="#accModal<?= $l->laporan_id ?>">
                                                 <i class="bi bi-check"></i> ACC
                                             </button>
@@ -188,32 +188,9 @@
 
     <!-- Sidebar -->
     <div class="col-lg-4">
-        <!-- Logbook Terbaru -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-journal-text me-2"></i>Logbook Terbaru
-            </div>
-            <div class="card-body">
-                <?php if (isset($recent_logbooks) && !empty($recent_logbooks)): ?>
-                    <?php foreach (array_slice($recent_logbooks, 0, 5) as $l): ?>
-                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                            <div>
-                                <strong class="d-block"><?= $l->nama_mahasiswa ?></strong>
-                                <small class="text-muted">Bulan ke-<?= $l->bulan_ke ?></small>
-                            </div>
-                            <div>
-                                <a href="<?= $l->link_logbook ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-box-arrow-up-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                    <a href="<?= base_url('dosen/logbook') ?>" class="btn btn-primary btn-sm w-100">Lihat Semua Logbook</a>
-                <?php else: ?>
-                    <p class="text-muted mb-0">Belum ada logbook</p>
-                <?php endif; ?>
-            </div>
-        </div>
+
+        <!-- Sebaran Magang -->
+        <?php $this->load->view('dashboard/_sebaran_cards', ['filter_url' => base_url('dashboard/dosen/sebaran_filter')]); ?>
 
         <!-- Jadwal Desiminasi -->
         <div class="card">
@@ -226,9 +203,9 @@
                         <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
                             <div>
                                 <strong class="d-block"><?= $j->nama_mahasiswa ?></strong>
-                                <small class="text-muted"><?= date('d M Y', strtotime($j->tanggal_desiminasi)) ?></small>
+                                <small class="text-muted"><?= format_indo('d M Y', strtotime($j->tanggal_desiminasi)) ?></small>
                             </div>
-                            <span class="badge bg-primary"><?= $j->waktu_mulai ?></span>
+                            <span class="badge bg-primary"><?= date('H:i', strtotime($j->waktu_mulai)) ?></span>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -238,6 +215,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Modals for Laporan Review - Placed at End of Page for Proper Z-Index -->
 <?php if (isset($pending_laporan) && !empty($pending_laporan)): ?>
@@ -274,7 +252,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check me-1"></i>ACC Laporan
                             </button>
                         </div>
@@ -317,3 +295,4 @@
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
+

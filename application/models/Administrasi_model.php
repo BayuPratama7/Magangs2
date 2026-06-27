@@ -26,7 +26,7 @@ class Administrasi_model extends CI_Model
     public function get_all_surat()
     {
         return $this->db
-            ->select('s.*, m.nim, m.nama_mahasiswa, p.instansi_tujuan')
+            ->select('s.*, m.nim, m.nama_mahasiswa, p.instansi_tujuan, p.jenis_magang')
             ->from('surat_pengantar s')
             ->join('mahasiswa m', 'm.mahasiswa_id = s.mahasiswa_id')
             ->join('proposal_magang p', 'p.proposal_id = s.proposal_id', 'left')

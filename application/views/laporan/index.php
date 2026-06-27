@@ -41,6 +41,12 @@
                                 placeholder="https://drive.google.com/..." required>
                             <small class="text-muted">Pastikan link dapat diakses oleh DPL</small>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Link Google Drive Penilaian Mitra <span class="text-muted">(Opsional)</span></label>
+                            <input type="url" name="link_penilaian_mitra" class="form-control"
+                                placeholder="https://drive.google.com/...">
+                            <small class="text-muted">Pastikan link dapat diakses oleh DPL</small>
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="bi bi-upload me-2"></i>Upload Laporan
                         </button>
@@ -55,7 +61,7 @@
                     </div>
                     <div class="card-body">
                         <p class="mb-3">Laporan Anda sudah di-ACC oleh DPL. Anda dapat mengajukan desiminasi sekarang.</p>
-                        <a href="<?= base_url('desiminasi') ?>" class="btn btn-success w-100">
+                        <a href="<?= base_url('desiminasi') ?>" class="btn btn-primary w-100">
                             <i class="bi bi-easel me-2"></i>Ajukan Desiminasi
                         </a>
                     </div>
@@ -85,13 +91,19 @@
                                 <tbody>
                                     <?php foreach ($laporan as $l): ?>
                                         <tr>
-                                            <td><?= date('d M Y', strtotime($l->tanggal_upload)) ?></td>
+                                            <td><?= format_indo('d M Y', strtotime($l->tanggal_upload)) ?></td>
                                             <td><span class="badge bg-secondary"><?= ucfirst($l->jenis_laporan) ?></span></td>
                                             <td>
                                                 <a href="<?= $l->link_laporan ?>" target="_blank"
-                                                    class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-box-arrow-up-right"></i>
+                                                    class="btn btn-sm btn-outline-primary" title="Lihat Laporan">
+                                                    <i class="bi bi-file-earmark-text"></i> Laporan
                                                 </a>
+                                                <?php if(!empty($l->link_penilaian_mitra)): ?>
+                                                    <a href="<?= $l->link_penilaian_mitra ?>" target="_blank"
+                                                        class="btn btn-sm btn-outline-info" title="Lihat Penilaian Mitra">
+                                                        <i class="bi bi-star"></i> Penilaian
+                                                    </a>
+                                                <?php endif; ?>
                                             </td>
                                             <td>
                                                 <span class="badge badge-<?= $l->status_dpl ?>">
@@ -124,7 +136,7 @@
                 <?php if (!empty($l->catatan_dpl)): ?>
                     <div class="card mt-3 border-warning">
                         <div class="card-header bg-warning-subtle">
-                            <i class="bi bi-chat-text me-2"></i>Catatan DPL - <?= date('d M Y', strtotime($l->tanggal_upload)) ?>
+                            <i class="bi bi-chat-text me-2"></i>Catatan DPL - <?= format_indo('d M Y', strtotime($l->tanggal_upload)) ?>
                         </div>
                         <div class="card-body">
                             <p class="mb-0"><?= nl2br($l->catatan_dpl) ?></p>

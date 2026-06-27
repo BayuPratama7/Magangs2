@@ -34,13 +34,13 @@
                                     <small class="text-muted"><?= $j->nim ?></small>
                                 </td>
                                 <td><?= isset($j->judul_proposal) ? $j->judul_proposal : '-' ?></td>
-                                <td><?= date('d M Y', strtotime($j->tanggal_desiminasi)) ?></td>
-                                <td><?= date('H:i', strtotime($j->waktu_mulai)) ?> -
-                                    <?= date('H:i', strtotime($j->waktu_selesai)) ?></td>
+                                <td><?= format_indo('d M Y', strtotime($j->tanggal_desiminasi)) ?></td>
+                                <td><?= format_indo('H:i', strtotime($j->waktu_mulai)) ?> -
+                                    <?= format_indo('H:i', strtotime($j->waktu_selesai)) ?></td>
                                 <td><?= $j->ruangan ?></td>
                                 <td>
                                     <?php
-                                    $today = date('Y-m-d');
+                                    $today = format_indo('Y-m-d');
                                     if ($j->tanggal_desiminasi < $today) {
                                         echo '<span class="badge bg-secondary">Selesai</span>';
                                     } elseif ($j->tanggal_desiminasi == $today) {
@@ -69,7 +69,7 @@
                                     <?php if (isset($j->status_laporan_akhir) && $j->status_laporan_akhir == 'disetujui'): ?>
                                         <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>ACC Penguji</span>
                                         <?php if ($j->tanggal_acc_laporan_akhir): ?>
-                                            <br><small class="text-muted"><?= date('d M Y', strtotime($j->tanggal_acc_laporan_akhir)) ?></small>
+                                            <br><small class="text-muted"><?= format_indo('d M Y', strtotime($j->tanggal_acc_laporan_akhir)) ?></small>
                                         <?php endif; ?>
                                     <?php elseif (isset($j->status_laporan_akhir) && $j->status_laporan_akhir == 'menunggu_revisi'): ?>
                                         <span class="badge bg-info">Revisi Diupload</span>

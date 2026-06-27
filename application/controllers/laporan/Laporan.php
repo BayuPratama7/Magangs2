@@ -61,7 +61,8 @@ class Laporan extends CI_Controller
             'mahasiswa_id' => $mahasiswa->mahasiswa_id,
             'proposal_id' => $proposal ? $proposal->proposal_id : null,
             'jenis_laporan' => $this->input->post('jenis_laporan'),
-            'link_laporan' => $this->input->post('link_laporan')
+            'link_laporan' => $this->input->post('link_laporan'),
+            'link_penilaian_mitra' => $this->input->post('link_penilaian_mitra')
         ];
 
         if ($this->Laporan_model->insert($data)) {

@@ -33,12 +33,13 @@ class Sekretaris extends CI_Controller
         $stats = new stdClass();
         $stats->pending_dpl = count($pending_dpl);
 
-        // Count mahasiswa yang sudah ACC tapi belum ada surat
+        // Count mahasiswa yang sudah ACC, BUTUH surat, tapi belum ada surat
         $this->db->select('m.mahasiswa_id')
             ->from('mahasiswa m')
             ->join('proposal_magang p', 'p.mahasiswa_id = m.mahasiswa_id')
             ->join('surat_pengantar s', 's.mahasiswa_id = m.mahasiswa_id', 'left')
             ->where('p.status_kaprodi', 'disetujui')
+            ->where('p.butuh_surat_pengantar', 1)
             ->where('s.surat_id IS NULL');
         $stats->pending_surat = $this->db->count_all_results();
 
@@ -56,18 +57,43 @@ class Sekretaris extends CI_Controller
         $stats->total_mitra = $this->Dashboard_model->count_mitra();
         $stats->total_sebaran = $this->db->count_all('sebaran_magang');
 
-        // Get sebaran jenis magang
+        // Get sebaran jenis magang & provinsi
         $sebaran_jenis = $this->Dashboard_model->get_sebaran_by_jenis();
+        $provinsi_list = $this->Dashboard_model->get_provinsi_list();
+        $sebaran_provinsi = $this->Dashboard_model->get_sebaran_by_provinsi();
+
+        $dosen_list = $this->Dosen_model->get_all_dpl();
 
         $data = [
             'page_title' => 'Dashboard Sekretaris',
             'pending_dpl' => $pending_dpl,
             'upcoming_jadwal' => $upcoming_jadwal,
             'stats' => $stats,
-            'sebaran_jenis' => $sebaran_jenis
+            'sebaran_jenis' => $sebaran_jenis,
+            'tahun_akademik_list' => $this->Dashboard_model->get_tahun_akademik_list(),
+            'provinsi_list' => $provinsi_list,
+            'sebaran_provinsi' => $sebaran_provinsi,
+            'dosen_list' => $dosen_list
         ];
 
         $data['content'] = $this->load->view('dashboard/sekretaris_content', $data, TRUE);
         $this->load->view('layouts/main', $data);
+    }
+
+    public function sebaran_filter()
+    {
+        if (!$this->input->is_ajax_request()) show_404();
+        $mode = $this->input->get('mode') ?? 'jenis';
+        if ($mode === 'provinsi') {
+            $data = $this->Dashboard_model->get_sebaran_by_provinsi();
+            $result = array_map(function($d) { return ['label' => $d->provinsi, 'total' => (int) $d->total]; }, $data);
+        } else {
+            $provinsi = $this->input->get('provinsi');
+            $tahun = $this->input->get('tahun');
+            $jenis = $this->input->get('jenis');
+            $data = $this->Dashboard_model->get_sebaran_by_jenis_provinsi($provinsi, $tahun, $jenis);
+            $result = array_map(function($d) { return ['label' => strtoupper($d->jenis_magang), 'key' => $d->jenis_magang, 'total' => (int) $d->total]; }, $data);
+        }
+        $this->output->set_content_type('application/json')->set_output(json_encode($result));
     }
 }

@@ -108,7 +108,7 @@
                                     if ($lap_status == 'disetujui'): ?>
                                         <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>SELESAI</span>
                                         <?php if (isset($h->tanggal_acc_laporan_akhir) && $h->tanggal_acc_laporan_akhir): ?>
-                                            <br><small class="text-success"><?= date('d M Y', strtotime($h->tanggal_acc_laporan_akhir)) ?></small>
+                                            <br><small class="text-success"><?= format_indo('d M Y', strtotime($h->tanggal_acc_laporan_akhir)) ?></small>
                                         <?php endif; ?>
                                     <?php elseif ($lap_status == 'menunggu_revisi'): ?>
                                         <span class="badge bg-info">Revisi Diupload</span>
@@ -134,3 +134,4 @@
         <i class="bi bi-arrow-left me-2"></i>Kembali ke Dashboard
     </a>
 </div>
+

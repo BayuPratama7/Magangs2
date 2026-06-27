@@ -67,12 +67,12 @@
                                         <td><?= $p->instansi_tujuan ?></td>
                                         <td><span class="badge bg-secondary"><?= strtoupper($p->jenis_magang) ?></span></td>
                                         <td>
-                                            <a href="<?= base_url('koordinator/detail/' . $p->proposal_id) ?>"
+                                            <a href="<?= $p->link_proposal ?>" target="_blank"
                                                 class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-eye"></i>
                                             </a>
                                             <a href="<?= base_url('koordinator/acc/' . $p->proposal_id) ?>"
-                                                class="btn btn-sm btn-success">
+                                                class="btn btn-sm btn-primary">
                                                 <i class="bi bi-check"></i>
                                             </a>
                                             <a href="<?= base_url('koordinator/reject/' . $p->proposal_id) ?>"
@@ -95,33 +95,12 @@
         </div>
     </div>
 
-    <!-- Recent Logbooks -->
     <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <i class="bi bi-journal-text me-2"></i>Logbook Terbaru
-            </div>
-            <div class="card-body">
-                <?php if (isset($recent_logbooks) && !empty($recent_logbooks)): ?>
-                    <?php foreach (array_slice($recent_logbooks, 0, 5) as $l): ?>
-                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                            <div>
-                                <strong class="d-block"><?= $l->nama_mahasiswa ?></strong>
-                                <small class="text-muted">Bulan ke-<?= $l->bulan_ke ?></small>
-                            </div>
-                            <a href="<?= $l->link_logbook ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p class="text-muted mb-0">Belum ada logbook</p>
-                <?php endif; ?>
-            </div>
-        </div>
+        <!-- Sebaran Magang -->
+        <?php $this->load->view('dashboard/_sebaran_cards', ['filter_url' => base_url('dashboard/koordinator/sebaran_filter')]); ?>
 
         <!-- Hasil Desiminasi Terakhir -->
-        <div class="card mt-4">
+        <div class="card">
             <div class="card-header">
                 <i class="bi bi-trophy me-2"></i>Hasil Desiminasi Terbaru
             </div>
@@ -217,68 +196,6 @@
                     <div class="text-center py-4">
                         <p class="text-muted mb-0">Belum ada data mahasiswa</p>
                     </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Sebaran Jenis Magang -->
-<div class="row mt-4">
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <i class="bi bi-pie-chart me-2"></i>Sebaran Jenis Magang
-            </div>
-            <div class="card-body">
-                <?php if (isset($sebaran_jenis) && !empty($sebaran_jenis)): ?>
-                    <div class="row align-items-center">
-                        <div class="col-md-7">
-                            <canvas id="sebaranChartKoordinator" style="max-height: 250px;"></canvas>
-                        </div>
-                        <div class="col-md-5">
-                            <?php
-                            $colors = ['reguler' => 'primary', 'bumn' => 'success', 'mbkm' => 'warning'];
-                            foreach ($sebaran_jenis as $s):
-                            ?>
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span>
-                                        <span class="badge bg-<?= $colors[$s->jenis_magang] ?? 'secondary' ?> me-2">&nbsp;</span>
-                                        <?= strtoupper($s->jenis_magang) ?>
-                                    </span>
-                                    <strong><?= $s->total ?></strong>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const ctxKoordinator = document.getElementById('sebaranChartKoordinator').getContext('2d');
-                            new Chart(ctxKoordinator, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: [<?php foreach ($sebaran_jenis as $s): ?>'<?= strtoupper($s->jenis_magang) ?>',<?php endforeach; ?>],
-                                    datasets: [{
-                                        data: [<?php foreach ($sebaran_jenis as $s): ?><?= $s->total ?>,<?php endforeach; ?>],
-                                        backgroundColor: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
-                                        borderWidth: 2,
-                                        borderColor: '#fff'
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: true,
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        }
-                                    }
-                                }
-                            });
-                        });
-                    </script>
-                <?php else: ?>
-                    <p class="text-muted mb-0">Data belum tersedia</p>
                 <?php endif; ?>
             </div>
         </div>

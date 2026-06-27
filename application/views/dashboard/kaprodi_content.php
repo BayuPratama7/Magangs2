@@ -78,7 +78,7 @@
                                                 <i class="bi bi-eye"></i>
                                             </a>
                                             <a href="<?= base_url('proposal/kaprodi/acc/' . $p->proposal_id) ?>"
-                                                class="btn btn-sm btn-success">
+                                                class="btn btn-sm btn-primary">
                                                 <i class="bi bi-check"></i> ACC
                                             </a>
                                             <a href="<?= base_url('proposal/kaprodi/reject/' . $p->proposal_id) ?>"
@@ -103,59 +103,8 @@
 
     <!-- Sidebar Stats -->
     <div class="col-lg-4">
-        <!-- Sebaran per Jenis -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-pie-chart me-2"></i>Sebaran Jenis Magang
-            </div>
-            <div class="card-body">
-                <?php if (isset($sebaran_jenis) && !empty($sebaran_jenis)): ?>
-                    <canvas id="sebaranChartKaprodi" style="max-height: 200px;"></canvas>
-                    <hr class="my-3">
-                    <?php
-                    $colors = ['reguler' => 'primary', 'bumn' => 'success', 'mbkm' => 'warning'];
-                    foreach ($sebaran_jenis as $s):
-                        ?>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span>
-                                <span class="badge bg-<?= $colors[$s->jenis_magang] ?? 'secondary' ?> me-2">&nbsp;</span>
-                                <?= strtoupper($s->jenis_magang) ?>
-                            </span>
-                            <strong><?= $s->total ?></strong>
-                        </div>
-                    <?php endforeach; ?>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const ctxKaprodi = document.getElementById('sebaranChartKaprodi').getContext('2d');
-                            new Chart(ctxKaprodi, {
-                                type: 'pie',
-                                data: {
-                                    labels: [<?php foreach ($sebaran_jenis as $s): ?>'<?= strtoupper($s->jenis_magang) ?>',<?php endforeach; ?>],
-                                    datasets: [{
-                                        data: [<?php foreach ($sebaran_jenis as $s): ?><?= $s->total ?>,<?php endforeach; ?>],
-                                        backgroundColor: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
-                                        borderWidth: 2,
-                                        borderColor: '#fff'
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: true,
-                                    plugins: {
-                                        legend: {
-                                            position: 'bottom',
-                                            labels: { padding: 15, usePointStyle: true }
-                                        }
-                                    }
-                                }
-                            });
-                        });
-                    </script>
-                <?php else: ?>
-                    <p class="text-muted mb-0">Data belum tersedia</p>
-                <?php endif; ?>
-            </div>
-        </div>
+        <!-- Sebaran Magang -->
+        <?php $this->load->view('dashboard/_sebaran_cards', ['filter_url' => base_url('dashboard/kaprodi/sebaran_filter')]); ?>
 
         <!-- Top Wilayah -->
         <div class="card">
@@ -176,4 +125,4 @@
             </div>
         </div>
     </div>
-</div>
+</div>

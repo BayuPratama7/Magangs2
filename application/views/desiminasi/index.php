@@ -29,7 +29,7 @@
                     <h5 class="mt-3">Anda Siap Desiminasi!</h5>
                     <p class="text-muted">Laporan Anda sudah di-ACC oleh DPL. Silakan ajukan desiminasi.</p>
                     <form method="post" action="<?= base_url('desiminasi/store') ?>">
-                        <button type="submit" class="btn btn-success btn-lg px-5">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
                             <i class="bi bi-send me-2"></i>Ajukan Desiminasi
                         </button>
                     </form>
@@ -59,7 +59,7 @@
                         </tr>
                         <tr>
                             <td><strong>Tanggal Pengajuan</strong></td>
-                            <td><?= date('d M Y H:i', strtotime($desiminasi->tanggal_pengajuan)) ?></td>
+                            <td><?= format_indo('d M Y H:i', strtotime($desiminasi->tanggal_pengajuan)) ?></td>
                         </tr>
                         <?php if ($desiminasi->nama_penguji): ?>
                             <tr>
@@ -72,14 +72,14 @@
                                 <td><strong>Tanggal Desiminasi</strong></td>
                                 <td>
                                     <i class="bi bi-calendar me-1"></i>
-                                    <?= date('d M Y', strtotime($desiminasi->tanggal_desiminasi)) ?>
+                                    <?= format_indo('d M Y', strtotime($desiminasi->tanggal_desiminasi)) ?>
                                 </td>
                             </tr>
                             <tr>
                                 <td><strong>Waktu</strong></td>
                                 <td>
                                     <i class="bi bi-clock me-1"></i>
-                                    <?= $desiminasi->waktu_mulai ?>
+                                    <?= date('H:i', strtotime($desiminasi->waktu_mulai)) ?>
                                 </td>
                             </tr>
                             <tr>
@@ -124,9 +124,11 @@
 
                         <?php if (!empty($hasil->catatan_penguji)): ?>
                             <?php if (empty($hasil->catatan_revisi)): ?><hr><?php endif; ?>
-                            <h6><i class="bi bi-pencil-square me-2"></i>Catatan Revisi Laporan dari Penguji:</h6>
-                            <div class="alert alert-warning py-2 mb-0">
-                                <?= nl2br($hasil->catatan_penguji) ?>
+                            <div class="card bg-light mb-3 border-0 shadow-sm">
+                                <div class="card-body py-3">
+                                    <h6 class="mb-2 text-dark"><i class="bi bi-pencil-square me-2"></i>Catatan Revisi Laporan dari Penguji:</h6>
+                                    <p class="mb-0 text-secondary" style="word-break: break-word;"><?= nl2br($hasil->catatan_penguji) ?></p>
+                                </div>
                             </div>
                         <?php endif; ?>
 
@@ -153,18 +155,11 @@
                             </div>
                         <?php elseif ($hasil->status_laporan_akhir == 'revisi'): ?>
                             <hr>
-                            <div class="alert alert-warning mb-3">
+                            <div class="alert alert-warning mb-3 border-0 shadow-sm">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Revisi Diperlukan!</strong> Silakan upload ulang laporan akhir.
+                                <strong>Revisi Diperlukan!</strong><br>
+                                Silakan upload ulang laporan akhir Anda setelah diperbaiki.
                             </div>
-                            <?php if (!empty($hasil->catatan_penguji)): ?>
-                                <div class="card bg-light mb-3">
-                                    <div class="card-body py-2">
-                                        <h6 class="mb-1"><i class="bi bi-pencil-square me-2"></i>Catatan Revisi dari Penguji:</h6>
-                                        <p class="mb-0"><?= nl2br($hasil->catatan_penguji) ?></p>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
                             <h6><i class="bi bi-upload me-2"></i>Upload Laporan Akhir (Revisi)</h6>
                             <form method="post" action="<?= base_url('desiminasi/upload_laporan_akhir') ?>">
                                 <div class="mb-3">
@@ -202,3 +197,4 @@
     </div>
 
 <?php endif; ?>
+

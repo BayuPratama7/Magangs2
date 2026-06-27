@@ -46,7 +46,7 @@
     <div class="col-6 col-md-3">
         <div class="card border-0 bg-info bg-opacity-10">
             <div class="card-body text-center py-3">
-                <h3 class="mb-0 text-info"><?= count(array_filter($mahasiswa_list, function($m) { return in_array($m->status_magang, ['diterima', 'sedang_magang']); })) ?></h3>
+                <h3 class="mb-0 text-info"><?= count(array_filter($mahasiswa_list, function($m) { return $m->status_magang === 'sedang_magang'; })) ?></h3>
                 <small class="text-muted">Sedang Magang</small>
             </div>
         </div>
@@ -54,8 +54,8 @@
     <div class="col-6 col-md-3">
         <div class="card border-0 bg-success bg-opacity-10">
             <div class="card-body text-center py-3">
-                <h3 class="mb-0 text-success"><?= count(array_filter($mahasiswa_list, function($m) { return $m->status_magang === 'selesai'; })) ?></h3>
-                <small class="text-muted">Selesai</small>
+                <h3 class="mb-0 text-success"><?= count(array_filter($mahasiswa_list, function($m) { return in_array($m->status_magang, ['selesai', 'selesai_magang']); })) ?></h3>
+                <small class="text-muted">Selesai Magang</small>
             </div>
         </div>
     </div>
@@ -72,10 +72,8 @@
                         <th>NIM</th>
                         <th>Nama</th>
                         <th>Angkatan</th>
-                        <th>Kelas</th>
-                        <th>No HP</th>
+                        <th>Instansi</th>
                         <th>Status</th>
-                        <th>DPL</th>
                         <th style="width: 120px" class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -85,12 +83,13 @@
                             <?php
                             $status_badges = [
                                 'belum_magang' => 'secondary',
-                                'diterima' => 'info',
                                 'sedang_magang' => 'primary',
+                                'selesai_magang' => 'success',
                                 'selesai' => 'success'
                             ];
                             $badge_color = $status_badges[$m->status_magang] ?? 'secondary';
                             $status_label = ucwords(str_replace('_', ' ', $m->status_magang));
+                            if ($m->status_magang === 'selesai') $status_label = 'Selesai Magang';
                             ?>
                             <tr>
                                 <td><?= $no++ ?></td>
@@ -98,12 +97,8 @@
                                 <td><?= htmlspecialchars($m->nama_mahasiswa) ?></td>
                                 <td><?= htmlspecialchars($m->angkatan) ?></td>
                                 <td><?= htmlspecialchars($m->kelas ?? '-') ?></td>
-                                <td><?= htmlspecialchars($m->no_hp ?? '-') ?></td>
                                 <td>
                                     <span class="badge bg-<?= $badge_color ?>"><?= $status_label ?></span>
-                                </td>
-                                <td>
-                                    <small class="text-muted"><?= htmlspecialchars($m->nama_dpl ?? 'Belum ditugaskan') ?></small>
                                 </td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-outline-info me-1" title="Detail"
@@ -123,7 +118,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="7" class="text-center py-5">
                                 <i class="bi bi-mortarboard display-4 text-muted d-block mb-3"></i>
                                 <p class="text-muted">Belum ada data mahasiswa</p>
                             </td>
@@ -141,12 +136,13 @@
         <?php
         $status_badges = [
             'belum_magang' => 'secondary',
-            'diterima' => 'info',
             'sedang_magang' => 'primary',
+            'selesai_magang' => 'success',
             'selesai' => 'success'
         ];
         $badge_color = $status_badges[$m->status_magang] ?? 'secondary';
         $status_label = ucwords(str_replace('_', ' ', $m->status_magang));
+        if ($m->status_magang === 'selesai') $status_label = 'Selesai Magang';
         ?>
 
         <!-- Detail Modal -->
@@ -161,11 +157,9 @@
                         <table class="table table-borderless mb-0">
                             <tr><th width="140">NIM</th><td><?= htmlspecialchars($m->nim) ?></td></tr>
                             <tr><th>Nama</th><td><?= htmlspecialchars($m->nama_mahasiswa) ?></td></tr>
-                            <tr><th>Prodi</th><td><?= htmlspecialchars($m->prodi ?? '-') ?></td></tr>
                             <tr><th>Angkatan</th><td><?= htmlspecialchars($m->angkatan ?? '-') ?></td></tr>
-                            <tr><th>Kelas</th><td><?= htmlspecialchars($m->kelas ?? '-') ?></td></tr>
-                            <tr><th>No HP</th><td><?= htmlspecialchars($m->no_hp ?? '-') ?></td></tr>
-                            <tr><th>Alamat</th><td><?= htmlspecialchars($m->alamat ?? '-') ?></td></tr>
+                            <tr><th>Instansi</th><td><?= htmlspecialchars($m->kelas ?? '-') ?></td></tr>
+                            <tr><th>Alamat Instansi</th><td><?= htmlspecialchars($m->no_hp ?? '-') ?></td></tr>
                             <tr><th>Status</th><td><span class="badge bg-<?= $badge_color ?>"><?= $status_label ?></span></td></tr>
                             <tr><th>DPL</th><td><?= htmlspecialchars($m->nama_dpl ?? 'Belum ditugaskan') ?></td></tr>
                             <?php if (!empty($m->judul_proposal)): ?>
@@ -202,37 +196,28 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Prodi</label>
-                                    <input type="text" name="prodi" class="form-control" value="<?= htmlspecialchars($m->prodi ?? 'Sistem Informasi') ?>">
-                                </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Angkatan <span class="text-danger">*</span></label>
                                     <input type="text" name="angkatan" class="form-control" value="<?= htmlspecialchars($m->angkatan) ?>" required>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Kelas</label>
-                                    <input type="text" name="kelas" class="form-control" value="<?= htmlspecialchars($m->kelas ?? '') ?>">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Instansi</label>
+                                    <input type="text" name="kelas" class="form-control bg-light" placeholder="Nama Instansi" value="<?= htmlspecialchars($m->kelas ?? '') ?>" disabled>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">No HP</label>
-                                    <input type="text" name="no_hp" class="form-control" value="<?= htmlspecialchars($m->no_hp ?? '') ?>">
+                                    <label class="form-label">Alamat Instansi</label>
+                                    <input type="text" name="no_hp" class="form-control bg-light" placeholder="Alamat lengkap instansi" value="<?= htmlspecialchars($m->no_hp ?? '') ?>" disabled>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Status Magang</label>
                                     <select name="status_magang" class="form-select">
                                         <option value="belum_magang" <?= $m->status_magang === 'belum_magang' ? 'selected' : '' ?>>Belum Magang</option>
-                                        <option value="diterima" <?= $m->status_magang === 'diterima' ? 'selected' : '' ?>>Diterima</option>
                                         <option value="sedang_magang" <?= $m->status_magang === 'sedang_magang' ? 'selected' : '' ?>>Sedang Magang</option>
-                                        <option value="selesai" <?= $m->status_magang === 'selesai' ? 'selected' : '' ?>>Selesai</option>
+                                        <option value="selesai_magang" <?= in_array($m->status_magang, ['selesai', 'selesai_magang']) ? 'selected' : '' ?>>Selesai Magang</option>
                                     </select>
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Alamat</label>
-                                <textarea name="alamat" class="form-control" rows="2"><?= htmlspecialchars($m->alamat ?? '') ?></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -312,28 +297,20 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Prodi</label>
-                            <input type="text" name="prodi" class="form-control" value="Sistem Informasi">
-                        </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Angkatan <span class="text-danger">*</span></label>
                             <input type="text" name="angkatan" class="form-control" placeholder="2023" required>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Kelas</label>
-                            <input type="text" name="kelas" class="form-control" placeholder="A / B / C">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Instansi</label>
+                            <input type="text" name="kelas" class="form-control bg-light" placeholder="Diisi oleh mahasiswa" disabled>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">No HP</label>
-                            <input type="text" name="no_hp" class="form-control" placeholder="08xxxxxxxxxx">
+                            <label class="form-label">Alamat Instansi</label>
+                            <input type="text" name="no_hp" class="form-control bg-light" placeholder="Diisi oleh mahasiswa" disabled>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Alamat</label>
-                        <textarea name="alamat" class="form-control" rows="2" placeholder="Alamat lengkap"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

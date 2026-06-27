@@ -20,6 +20,7 @@
                             <th>Mahasiswa</th>
                             <th>Judul Proposal</th>
                             <th>Instansi</th>
+                            <th>Tahun Akademik</th>
                             <th>Jenis</th>
                             <th>Link</th>
                             <th>Status</th>
@@ -37,6 +38,7 @@
                                 </td>
                                 <td><?= $p->judul_proposal ?></td>
                                 <td><?= $p->instansi_tujuan ?></td>
+                                <td><?= isset($p->tahun_akademik) ? $p->tahun_akademik : '-' ?></td>
                                 <td>
                                     <span class="badge bg-primary"><?= strtoupper($p->jenis_magang) ?></span>
                                 </td>
@@ -53,7 +55,7 @@
                                 <td>
                                     <?php if ($p->status_koordinator == 'menunggu'): ?>
                                         <a href="<?= base_url('koordinator/acc/' . $p->proposal_id) ?>"
-                                            class="btn btn-sm btn-success" onclick="return confirm('Setujui proposal ini?')">
+                                            class="btn btn-sm btn-primary" onclick="return confirm('Setujui proposal ini?')">
                                             <i class="bi bi-check-circle me-1"></i>ACC
                                         </a>
                                         <button class="btn btn-sm btn-danger" data-bs-toggle="modal"

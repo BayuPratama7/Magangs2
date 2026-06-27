@@ -1,7 +1,15 @@
-<!-- Hasil Desiminasi - Sekretaris View -->
+<style>
+    .stat-custom { border: none; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .bg-figma-green { background-color: #399d5a !important; color: white; }
+    .bg-figma-blue { background-color: #3a7ef0 !important; color: white; }
+    .bg-figma-yellow { background-color: #f7b92f !important; color: white; }
+    .bg-figma-cyan { background-color: #15c3d2 !important; color: white; }
+    .table-header-custom th { font-size: 0.75rem; color: #6c757d; font-weight: 600; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding: 1rem 0.75rem; background: transparent; }
+</style>
+
 <div class="row mb-4">
     <div class="col-12">
-        <h4 class="mb-1"><i class="bi bi-trophy me-2"></i>Hasil Desiminasi Mahasiswa</h4>
+        <h4 class="mb-1"><i class="bi bi-check-circle me-2"></i>Hasil Desiminasi Mahasiswa</h4>
         <p class="text-muted mb-0">Data mahasiswa yang telah menyelesaikan desiminasi dan di-ACC penguji</p>
     </div>
 </div>
@@ -16,56 +24,42 @@
 <!-- Summary Stats -->
 <div class="row g-3 mb-4">
     <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body text-center py-3">
-                <h3 class="mb-0"><?= count(array_filter($hasil ?? [], function($h) { return isset($h->status_laporan_akhir) && $h->status_laporan_akhir == 'disetujui'; })) ?></h3>
-                <small>Selesai (ACC Penguji)</small>
+        <div class="card stat-custom bg-figma-green">
+            <div class="card-body text-center py-4">
+                <h2 class="mb-1 fw-bold"><?= count(array_filter($hasil ?? [], function($h) { return isset($h->status_laporan_akhir) && $h->status_laporan_akhir == 'disetujui'; })) ?></h2>
+                <small class="fw-medium">Selesai (ACC Penguji)</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body text-center py-3">
-                <h3 class="mb-0"><?= count(array_filter($hasil ?? [], function($h) { return $h->status_kelulusan == 'lulus'; })) ?></h3>
-                <small>Lulus</small>
+        <div class="card stat-custom bg-figma-blue">
+            <div class="card-body text-center py-4">
+                <h2 class="mb-1 fw-bold"><?= count(array_filter($hasil ?? [], function($h) { return $h->status_kelulusan == 'lulus'; })) ?></h2>
+                <small class="fw-medium">Lulus</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-warning text-dark">
-            <div class="card-body text-center py-3">
-                <h3 class="mb-0"><?= count(array_filter($hasil ?? [], function($h) { return $h->status_kelulusan == 'lulus_bersyarat'; })) ?></h3>
-                <small>Lulus Bersyarat</small>
+        <div class="card stat-custom bg-figma-yellow">
+            <div class="card-body text-center py-4">
+                <h2 class="mb-1 fw-bold"><?= count(array_filter($hasil ?? [], function($h) { return $h->status_kelulusan == 'lulus_bersyarat'; })) ?></h2>
+                <small class="fw-medium">Lulus Bersyarat</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body text-center py-3">
-                <h3 class="mb-0"><?= count($hasil ?? []) ?></h3>
-                <small>Total Hasil</small>
+        <div class="card stat-custom bg-figma-cyan">
+            <div class="card-body text-center py-4">
+                <h2 class="mb-1 fw-bold"><?= count($hasil ?? []) ?></h2>
+                <small class="fw-medium">Total Hasil</small>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Navigation Tabs -->
-<ul class="nav nav-tabs mb-3">
-    <li class="nav-item">
-        <a class="nav-link" href="<?= base_url('sekretaris/desiminasi') ?>">
-            <i class="bi bi-hourglass me-1"></i>Pengajuan Pending
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="<?= base_url('sekretaris/desiminasi/hasil') ?>">
-            <i class="bi bi-trophy me-1"></i>Hasil Desiminasi
-        </a>
-    </li>
-</ul>
-
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-table me-2"></i>Data Hasil Desiminasi</span>
+<div class="card border-0 shadow-sm" style="border-radius: 12px;">
+    <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+        <span class="fw-bold" style="color: #4b5563;"><i class="bi bi-inbox me-2"></i>Data Hasil Desiminasi</span>
     </div>
     <div class="card-body p-0">
         <?php if (empty($hasil)): ?>
@@ -75,15 +69,15 @@
             </div>
         <?php else: ?>
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
+                <table class="table mb-0 align-middle">
+                    <thead class="table-header-custom">
                         <tr>
                             <th>No</th>
                             <th>NIM</th>
                             <th>Nama Mahasiswa</th>
                             <th>Judul/Instansi</th>
                             <th>Penguji</th>
-                            <th>Nilai</th>
+                            <th class="text-center">Nilai</th>
                             <th>Status Kelulusan</th>
                             <th>Laporan Akhir</th>
                             <th>Status Final</th>
@@ -130,7 +124,7 @@
                                     if ($lap_status == 'disetujui'): ?>
                                         <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>ACC PENGUJI</span>
                                         <?php if (isset($h->tanggal_acc_laporan_akhir) && $h->tanggal_acc_laporan_akhir): ?>
-                                            <br><small class="text-success"><?= date('d M Y', strtotime($h->tanggal_acc_laporan_akhir)) ?></small>
+                                            <br><small class="text-success"><?= format_indo('d M Y', strtotime($h->tanggal_acc_laporan_akhir)) ?></small>
                                         <?php endif; ?>
                                     <?php elseif ($lap_status == 'menunggu_revisi'): ?>
                                         <span class="badge bg-info">Revisi Diupload</span>
@@ -149,10 +143,5 @@
             </div>
         <?php endif; ?>
     </div>
-</div>
 
-<div class="mt-4">
-    <a href="<?= base_url('dashboard/sekretaris') ?>" class="btn btn-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Kembali ke Dashboard
-    </a>
-</div>
+

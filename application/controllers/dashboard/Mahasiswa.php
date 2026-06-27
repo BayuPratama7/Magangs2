@@ -70,16 +70,20 @@ class Mahasiswa extends CI_Controller
         $stats->laporan_status = $laporan ? ucfirst($laporan->status_dpl) : 'Belum';
         
         // Detailed desiminasi status
+        // Prioritas: selesai → revisi laporan → sudah dinilai → menunggu ACC laporan → proses pengajuan → belum
         if ($hasil_desiminasi && $hasil_desiminasi->status_laporan_akhir == 'disetujui') {
             $stats->desiminasi_status = 'Selesai';
-        } elseif ($hasil_desiminasi && $hasil_desiminasi->status_laporan_akhir == 'menunggu_revisi') {
-            $stats->desiminasi_status = 'Revisi Diupload';
         } elseif ($hasil_desiminasi && $hasil_desiminasi->status_laporan_akhir == 'revisi') {
             $stats->desiminasi_status = 'Perlu Revisi';
-        } elseif ($hasil_desiminasi && $hasil_desiminasi->status_laporan_akhir == 'menunggu') {
+        } elseif ($hasil_desiminasi && $hasil_desiminasi->status_laporan_akhir == 'menunggu_revisi') {
+            $stats->desiminasi_status = 'Revisi Diupload';
+        } elseif ($hasil_desiminasi && !empty($hasil_desiminasi->link_laporan_akhir) && $hasil_desiminasi->status_laporan_akhir == 'menunggu') {
             $stats->desiminasi_status = 'Menunggu ACC';
         } elseif ($hasil_desiminasi && $hasil_desiminasi->status_kelulusan) {
+            // Penguji sudah input nilai, mahasiswa perlu upload laporan akhir
             $stats->desiminasi_status = ucfirst(str_replace('_', ' ', $hasil_desiminasi->status_kelulusan));
+        } elseif ($desiminasi && $desiminasi->status_pengajuan == 'diterima') {
+            $stats->desiminasi_status = 'Terjadwal';
         } elseif ($desiminasi) {
             $stats->desiminasi_status = ucfirst($desiminasi->status_pengajuan);
         } else {
@@ -87,8 +91,10 @@ class Mahasiswa extends CI_Controller
         }
 
         // Dashboard info
-        $mitra = $this->Dashboard_model->get_all_mitra();
+        $mitra = $this->Dashboard_model->get_latest_mitra(5);
         $sebaran_jenis = $this->Dashboard_model->get_sebaran_by_jenis();
+        $provinsi_list = $this->Dashboard_model->get_provinsi_list();
+        $sebaran_provinsi = $this->Dashboard_model->get_sebaran_by_provinsi();
 
         $data = [
             'page_title' => 'Dashboard Mahasiswa',
@@ -100,10 +106,51 @@ class Mahasiswa extends CI_Controller
             'desiminasi' => $desiminasi,
             'hasil_desiminasi' => $hasil_desiminasi,
             'mitra' => $mitra,
-            'sebaran_jenis' => $sebaran_jenis
+            'total_mitra' => $this->Dashboard_model->count_mitra(),
+            'sebaran_jenis' => $this->Dashboard_model->get_sebaran_by_jenis(),
+            'tahun_akademik_list' => $this->Dashboard_model->get_tahun_akademik_list(),
+            'provinsi_list' => $provinsi_list,
+            'sebaran_provinsi' => $sebaran_provinsi
         ];
 
         $data['content'] = $this->load->view('dashboard/mahasiswa_content', $data, TRUE);
         $this->load->view('layouts/main', $data);
+    }
+
+    /**
+     * AJAX endpoint: filter sebaran data
+     * mode=jenis&provinsi=xxx  → get jenis breakdown filtered by provinsi
+     * mode=provinsi            → get provinsi breakdown (all)
+     */
+    public function sebaran_filter()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $mode = $this->input->get('mode') ?? 'jenis';
+
+        if ($mode === 'provinsi') {
+            // Return sebaran grouped by provinsi
+            $data = $this->Dashboard_model->get_sebaran_by_provinsi();
+            $result = [];
+            foreach ($data as $d) {
+                $result[] = [
+                    'label' => $d->provinsi,
+                    'total' => (int) $d->total
+                ];
+            }
+        } else {
+            // Return sebaran by jenis, optionally filtered by provinsi
+            $provinsi = $this->input->get('provinsi');
+            $tahun = $this->input->get('tahun');
+            $jenis = $this->input->get('jenis');
+            $data = $this->Dashboard_model->get_sebaran_by_jenis_provinsi($provinsi, $tahun, $jenis);
+            $result = array_map(function($d) { return ['label' => strtoupper($d->jenis_magang), 'key' => $d->jenis_magang, 'total' => (int) $d->total]; }, $data);
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($result));
     }
 }

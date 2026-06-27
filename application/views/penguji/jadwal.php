@@ -13,8 +13,8 @@
                 <div class="card h-100">
                     <div class="card-header bg-<?= $j->status == 'selesai' ? 'success' : 'primary' ?> text-white">
                         <div class="d-flex justify-content-between align-items-center">
-                            <strong><?= date('d M Y', strtotime($j->tanggal_desiminasi)) ?></strong>
-                            <span class="badge bg-light text-dark"><?= $j->waktu_mulai ?></span>
+                            <strong><?= format_indo('d M Y', strtotime($j->tanggal_desiminasi)) ?></strong>
+                            <span class="badge bg-light text-dark"><?= date('H:i', strtotime($j->waktu_mulai)) ?></span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -32,13 +32,24 @@
                         <?php endif; ?>
                     </div>
                     <div class="card-footer">
-                        <?php if ($j->status == 'terjadwal'): ?>
+                        <?php if ($j->status == 'selesai'): ?>
+                            <!-- Sudah dinilai - tampilkan tombol lihat/edit hasil -->
+                            <a href="<?= base_url('penguji/input_hasil/' . $j->desiminasi_id) ?>"
+                                class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-eye me-1"></i>Lihat Hasil
+                            </a>
+                        <?php elseif (in_array($j->status, ['terjadwal', 'terkonfirmasi'])): ?>
+                            <!-- Jadwal aktif - tampilkan tombol input hasil -->
                             <a href="<?= base_url('penguji/input_hasil/' . $j->desiminasi_id) ?>"
                                 class="btn btn-primary btn-sm w-100">
                                 <i class="bi bi-pencil me-1"></i>Input Hasil
                             </a>
+                        <?php elseif ($j->status == 'menunggu_konfirmasi'): ?>
+                            <!-- Menunggu konfirmasi - tampilkan info -->
+                            <span class="badge bg-warning text-dark w-100 py-2">Menunggu Konfirmasi</span>
                         <?php else: ?>
-                            <span class="badge bg-success w-100 py-2">Selesai</span>
+                            <!-- Status lainnya (batal, dll) -->
+                            <span class="badge bg-secondary w-100 py-2"><?= ucfirst(str_replace('_', ' ', $j->status)) ?></span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -53,3 +64,4 @@
         </div>
     </div>
 <?php endif; ?>
+

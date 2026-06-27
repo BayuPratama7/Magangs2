@@ -14,12 +14,16 @@ class Kaprodi extends CI_Controller
 
     public function index()
     {
+        $this->Mahasiswa_model->sync_all_statuses();
+
         // Get pending proposals (sudah di-ACC koordinator)
         $pending_proposals = $this->Proposal_model->get_pending_kaprodi();
 
         // Get sebaran data
         $sebaran_jenis = $this->Dashboard_model->get_sebaran_by_jenis();
         $sebaran_wilayah = $this->Dashboard_model->get_sebaran_by_wilayah();
+        $provinsi_list = $this->Dashboard_model->get_provinsi_list();
+        $sebaran_provinsi = $this->Dashboard_model->get_sebaran_by_provinsi();
 
         // Stats
         $stats = new stdClass();
@@ -33,6 +37,9 @@ class Kaprodi extends CI_Controller
             'pending_proposals' => $pending_proposals,
             'sebaran_jenis' => $sebaran_jenis,
             'sebaran_wilayah' => $sebaran_wilayah,
+            'tahun_akademik_list' => $this->Dashboard_model->get_tahun_akademik_list(),
+            'provinsi_list' => $provinsi_list,
+            'sebaran_provinsi' => $sebaran_provinsi,
             'stats' => $stats
         ];
 
@@ -65,5 +72,22 @@ class Kaprodi extends CI_Controller
 
         $data['content'] = $this->load->view('dashboard/kaprodi_hasil', $data, TRUE);
         $this->load->view('layouts/main', $data);
+    }
+
+    public function sebaran_filter()
+    {
+        if (!$this->input->is_ajax_request()) show_404();
+        $mode = $this->input->get('mode') ?? 'jenis';
+        if ($mode === 'provinsi') {
+            $data = $this->Dashboard_model->get_sebaran_by_provinsi();
+            $result = array_map(function($d) { return ['label' => $d->provinsi, 'total' => (int) $d->total]; }, $data);
+        } else {
+            $provinsi = $this->input->get('provinsi');
+            $tahun = $this->input->get('tahun');
+            $jenis = $this->input->get('jenis');
+            $data = $this->Dashboard_model->get_sebaran_by_jenis_provinsi($provinsi, $tahun, $jenis);
+            $result = array_map(function($d) { return ['label' => strtoupper($d->jenis_magang), 'key' => $d->jenis_magang, 'total' => (int) $d->total]; }, $data);
+        }
+        $this->output->set_content_type('application/json')->set_output(json_encode($result));
     }
 }

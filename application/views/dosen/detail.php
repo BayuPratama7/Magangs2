@@ -119,7 +119,7 @@
                             <tbody>
                                 <?php foreach ($laporan as $l): ?>
                                     <tr>
-                                        <td><?= date('d M Y', strtotime($l->tanggal_upload)) ?></td>
+                                        <td><?= format_indo('d M Y', strtotime($l->tanggal_upload)) ?></td>
                                         <td><?= ucfirst($l->jenis_laporan) ?></td>
                                         <td>
                                             <span class="badge badge-<?= $l->status_dpl ?>">

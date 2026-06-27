@@ -24,6 +24,18 @@ class Logbook extends CI_Controller
         // Check if proposal approved
         $proposal = $this->Proposal_model->get_by_mahasiswa($mahasiswa->mahasiswa_id);
 
+        // NEW: Check if DPL has been assigned
+        if (!$mahasiswa->dosen_dpl_id) {
+            $data = [
+                'page_title' => 'Logbook Magang',
+                'mahasiswa' => $mahasiswa,
+                'proposal' => $proposal
+            ];
+            $data['content'] = $this->load->view('logbook/error_no_dpl', $data, TRUE);
+            $this->load->view('layouts/main', $data);
+            return;
+        }
+
         // Get logbooks
         $logbooks = $this->Logbook_model->get_by_mahasiswa($mahasiswa->mahasiswa_id);
 
