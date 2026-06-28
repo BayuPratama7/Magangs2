@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class DosenController extends CI_Controller
+class Dosencontroller extends CI_Controller
 {
 
     public function __construct()
