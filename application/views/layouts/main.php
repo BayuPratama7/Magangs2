@@ -800,10 +800,6 @@
                     class="<?= strpos($current_url, 'admin/surat') !== false ? 'active' : '' ?>">
                     <i class="bi bi-envelope"></i> Surat Pengantar
                 </a>
-                <a href="<?= base_url('admin/jadwal') ?>"
-                    class="<?= strpos($current_url, 'admin/jadwal') !== false ? 'active' : '' ?>">
-                    <i class="bi bi-calendar-event"></i> Jadwal Desiminasi
-                </a>
                 <div class="menu-header">Hasil Magang</div>
                 <a href="<?= base_url('sekretaris/desiminasi') ?>"
                     class="<?= strpos($current_url, 'sekretaris/desiminasi') !== false && strpos($current_url, 'hasil') === false ? 'active' : '' ?>">
