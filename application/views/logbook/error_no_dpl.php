@@ -1,7 +1,10 @@
 <div class="row mb-4">
     <div class="col-12">
         <h4 class="mb-1">Logbook Magang</h4>
-        <p class="text-muted mb-0">Input link Google Drive logbook bulanan Anda</p>
+        <p class="text-muted mb-2">Input link Google Drive logbook bulanan Anda</p>
+        <a href="https://docs.google.com/spreadsheets/d/1CoYWG2Oz1Xs-ShbYAMBCIM6Gb7WinAuY/edit?gid=1892661853#gid=1892661853" target="_blank" class="btn btn-outline-primary mt-2">
+            <i class="bi bi-download me-1"></i> Unduh Template Logbook
+        </a>
     </div>
 </div>
 
