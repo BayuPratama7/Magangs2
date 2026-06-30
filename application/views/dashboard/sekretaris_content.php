@@ -66,7 +66,7 @@
                         </a>
                     </div>
                     <div class="col-md-3">
-                        <a href="<?= base_url('admin/jadwal') ?>" class="btn btn-outline-danger w-100 py-3">
+                        <a href="<?= base_url('dosen/jadwal') ?>" class="btn btn-outline-danger w-100 py-3">
                             <i class="bi bi-calendar-event d-block fs-3 mb-2"></i>
                             Lihat Jadwal
                         </a>
