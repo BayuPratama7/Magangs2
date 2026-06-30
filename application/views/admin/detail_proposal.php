@@ -11,7 +11,7 @@
 
 <div class="row g-4">
     <!-- Kolom Utama: Informasi Magang -->
-    <div class="col-lg-8">
+    <div class="col-12">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
                 <h6 class="text-uppercase fw-bold text-muted mb-0">Informasi Magang</h6>
@@ -64,32 +64,27 @@
                         <p class="text-muted mb-1 small text-uppercase fw-bold"><i class="bi bi-clock-history me-2"></i>Tanggal Pengajuan</p>
                         <p class="mb-0 fw-medium"><?= isset($proposal->tanggal_pengajuan) ? format_indo('d M Y', strtotime($proposal->tanggal_pengajuan)) : '-' ?></p>
                     </div>
-                    <div>
+                    <div class="d-flex gap-2">
                         <a href="<?= $proposal->link_proposal ?>" target="_blank" class="btn btn-outline-primary shadow-sm px-4">
                             <i class="bi bi-box-arrow-up-right me-2"></i>Buka Dokumen
                         </a>
+                        <?php if ($this->session->userdata('role_id') == 3): ?>
+                        <button class="btn btn-primary shadow-sm px-4 btn-buat-surat"
+                            data-mahasiswa-id="<?= $proposal->mahasiswa_id ?>"
+                            data-proposal-id="<?= $proposal->proposal_id ?>"
+                            data-nama="<?= htmlspecialchars($mahasiswa ? $mahasiswa->nama_mahasiswa : 'Mahasiswa') ?>"
+                            data-nim="<?= htmlspecialchars($mahasiswa ? $mahasiswa->nim : '-') ?>"
+                            data-instansi="<?= htmlspecialchars($proposal->instansi_tujuan) ?>">
+                            <i class="bi bi-envelope-plus me-2"></i>Buat Surat Pengantar
+                        </button>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Kolom Samping: Status & DPL -->
-    <div class="col-lg-4">
 
-        <?php if ($this->session->userdata('role_id') == 3): ?>
-        <div class="mt-3 text-end">
-            <button class="btn btn-primary shadow-sm px-4 btn-buat-surat"
-                data-mahasiswa-id="<?= $proposal->mahasiswa_id ?>"
-                data-proposal-id="<?= $proposal->proposal_id ?>"
-                data-nama="<?= htmlspecialchars($mahasiswa ? $mahasiswa->nama_mahasiswa : 'Mahasiswa') ?>"
-                data-nim="<?= htmlspecialchars($mahasiswa ? $mahasiswa->nim : '-') ?>"
-                data-instansi="<?= htmlspecialchars($proposal->instansi_tujuan) ?>">
-                <i class="bi bi-envelope-plus me-2"></i>Buat Surat Pengantar
-            </button>
-        </div>
-        <?php endif; ?>
-    </div>
 </div>
 
 <?php if ($this->session->userdata('role_id') == 3): ?>
