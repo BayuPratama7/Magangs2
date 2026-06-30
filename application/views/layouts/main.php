@@ -22,7 +22,7 @@
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-gradient: #0073AC;
             --sidebar-bg: #1e293b;
             --sidebar-hover: #334155;
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -192,7 +192,7 @@
         .sidebar-menu a.active {
             background: var(--sidebar-hover);
             color: white;
-            border-left: 3px solid #667eea;
+            border-left: 3px solid #0073AC;
         }
 
         .sidebar-menu a i {
@@ -289,7 +289,7 @@
         }
 
         .stat-card.purple {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0073AC;
         }
 
         .stat-card.blue {
@@ -391,7 +391,7 @@
         }
 
         .btn-primary:hover {
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 115, 172, 0.4);
         }
 
         /* Forms */
@@ -405,8 +405,8 @@
 
         .form-control:focus,
         .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            border-color: #0073AC;
+            box-shadow: 0 0 0 3px rgba(0, 115, 172, 0.15);
         }
 
         .form-label {
@@ -538,13 +538,13 @@
 
         .modal-footer .btn-success:hover,
         .modal-footer .btn-primary:hover {
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 115, 172, 0.4);
         }
 
         /* Icon di dalam modal body mengikuti tema */
         .modal-body .text-success.display-4,
         .modal-body .text-success.display-1 {
-            color: #667eea !important;
+            color: #0073AC !important;
         }
 
         /* Responsive - Sidebar toggle */
@@ -603,7 +603,7 @@
             left: 50%;
             width: 35px;
             height: 35px;
-            background: #667eea;
+            background: #0073AC;
             border-radius: 50%;
             transform: translate(-50%, -50%);
         }
@@ -614,7 +614,7 @@
 
         .blob-2 {
             animation: metaball-move 1.2s infinite alternate-reverse ease-in-out;
-            background: #764ba2;
+            background: #005a8a;
         }
 
         @keyframes metaball-move {
