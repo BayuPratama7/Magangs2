@@ -1099,9 +1099,9 @@ INSERT INTO public.dosen VALUES (7, 12, NULL, 'Dosen Dua', NULL, NULL, NULL, tru
 INSERT INTO public.dosen VALUES (3, 1, NULL, 'Kaprodi', NULL, NULL, NULL, true, true, '2026-03-28 20:51:09.849304', '2026-03-28 20:51:09.849304');
 INSERT INTO public.dosen VALUES (5, 3, NULL, 'Sekretaris Prodi', NULL, NULL, NULL, true, true, '2026-03-28 20:51:09.849304', '2026-03-28 20:51:09.849304');
 INSERT INTO public.dosen VALUES (4, 2, NULL, 'Koordinator Magang', NULL, NULL, NULL, true, true, '2026-03-28 20:51:09.849304', '2026-03-28 20:51:09.849304');
-INSERT INTO public.dosen VALUES (8, 60, '10003', 'Dosen Tiga', NULL, NULL, NULL, false, false, '2026-06-28 02:43:00.344794', '2026-06-28 02:43:00.344794');
-INSERT INTO public.dosen VALUES (9, 61, '10004', 'Dosen Empat', NULL, NULL, NULL, false, false, '2026-06-28 02:43:00.344794', '2026-06-28 02:43:00.344794');
-INSERT INTO public.dosen VALUES (10, 62, '10005', 'Dosen Lima', NULL, NULL, NULL, false, false, '2026-06-28 02:43:00.344794', '2026-06-28 02:43:00.344794');
+INSERT INTO public.dosen VALUES (8, 60, '10003', 'Dosen Tiga', NULL, NULL, NULL, false, true, '2026-06-28 02:43:00.344794', '2026-06-28 02:43:00.344794');
+INSERT INTO public.dosen VALUES (9, 61, '10004', 'Dosen Empat', NULL, NULL, NULL, false, true, '2026-06-28 02:43:00.344794', '2026-06-28 02:43:00.344794');
+INSERT INTO public.dosen VALUES (10, 62, '10005', 'Dosen Lima', NULL, NULL, NULL, false, true, '2026-06-28 02:43:00.344794', '2026-06-28 02:43:00.344794');
 
 
 --
@@ -1277,6 +1277,9 @@ INSERT INTO public.user_roles VALUES (68, 58, 5, '2026-06-27 15:38:49');
 INSERT INTO public.user_roles VALUES (70, 60, 4, '2026-06-28 02:43:00.344794');
 INSERT INTO public.user_roles VALUES (71, 61, 4, '2026-06-28 02:43:00.344794');
 INSERT INTO public.user_roles VALUES (72, 62, 4, '2026-06-28 02:43:00.344794');
+INSERT INTO public.user_roles VALUES (73, 60, 6, '2026-06-28 02:43:00.344794');
+INSERT INTO public.user_roles VALUES (74, 61, 6, '2026-06-28 02:43:00.344794');
+INSERT INTO public.user_roles VALUES (75, 62, 6, '2026-06-28 02:43:00.344794');
 
 
 --
