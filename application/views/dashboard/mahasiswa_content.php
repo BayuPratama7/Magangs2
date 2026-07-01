@@ -401,10 +401,12 @@
                 <?php if (isset($mitra) && !empty($mitra)): ?>
                     <ul class="list-unstyled mb-0">
                         <?php foreach (array_slice($mitra, 0, 5) as $m): ?>
-                            <li class="mb-2">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <small><?= $m->nama_mitra ?></small>
-                                <span class="badge bg-light text-dark float-end"><?= $m->kota ?></span>
+                            <li class="mb-3 d-flex justify-content-between align-items-center">
+                                <div class="text-truncate pe-2">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    <small title="<?= $m->nama_mitra ?>"><?= $m->nama_mitra ?></small>
+                                </div>
+                                <span class="badge bg-light text-dark border"><?= $m->kota ?></span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
